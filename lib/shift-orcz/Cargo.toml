@@ -1,0 +1,14 @@
+[package]
+name = "shift-orcz"
+version = "0.0.1"
+authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
+edition = "2018"
+
+[dependencies]
+chrono = "0.4.11"
+logos = "0.11.4"
+reqwest = "0.10.4"
+select = "0.4.3"
+
+[dev-dependencies]
+tokio = { version = "0.2.21", features = [ "macros" ] }

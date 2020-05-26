@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SHiFT</title>
+  <link rel="stylesheet" media="screen" href="/assets/application-f0c72f1513440f3cd697ffca62bccfd08d9a9e23e8a95a05e2a9be40f5d8cb46.css" />
+  <script src="/assets/application-ea72e14c9915e43010d7c237444374712c3f3a2c33a4c941a5e2525532c69210.js"></script>
+  <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="b3QJu0KcrbA43tlvYXX2MQvGtwUhcF/2O6tbqNRBdelObX1PfpDv330X/FG540KkyFCSNmCbmv6RcGw7FWtFaQ==" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon-fe0b5e38406966e496383cdfbaf5314861496ad4b9248d67df2c3ca1e2c13d5d.ico" />
+  <link rel="apple-touch-icon" type="image/png" href="/assets/shift-f140d801a12ee56e3b1447ac185906ea0591593e19f8a7008f27f44fb9ec5905.png" />
+</head>
+<body class="sh_signed_in">
+
+<div id="modal_bg"  style="display:none;" ></div>
+
+<div class="sh_logged_in_container">
+  <nav class="nav-horizontal navbar navbar-default" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" data-test>
+          <img class="sh_brand" src="/assets/logo-91afdafa421f05688bd3a7adcdbe96e3a4d94a45bf8c246dd9c1935f6b500582.svg" />
+        </a>
+        <div class="sh_mobile_logout">
+          <a href="/logout">Sign Out</a>
+        </div>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+        <ul class="nav navbar-nav shift-navbar-items">
+          <li><a href="/account">Profile</a><i class="fas fa-user"></i></li>
+          <li><a href="/associations">Gaming Platforms</a><i class="fas fa-share-alt"></i></li>
+          <li><a href="/password/change">Password</a><i class="fas fa-lock"></i></li>
+          <li><a href="/account/preferences">User Preferences</a><i class="far fa-envelope"></i>
+          </li>
+          <li><a href="/rewards">Rewards</a><i class="fas fa-gift"></i></li>
+                    <li><a href="/account/other">Other</a><i class="fas fa-shield-alt"></i></li>
+        </ul>
+        <ul class="nav navbar-nav shift-navbar-items-static">
+          <li><a href="http://support.gearboxsoftware.com/categories/20064372-shift">Support</a></li>
+          <li class="hide_link_on_mobile"><a href="/logout">Sign Out</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+  </nav>
+
+  <div class="container">
+    <div class="sh_fixed_image sh_fixed_image_01"></div>
+    <div class="row body-container">
+      <div id="flash-messages">
+      </div>
+      <div class="col-md-3">
+        <ul class="nav nav-primary nav-pills nav-stacked">
+          <li class="active"><a data-pjax="data-pjax" href="/account">Profile</a>
+            <i class="fas fa-user"></i></li>
+          <li class=""><a data-pjax="data-pjax" href="/associations">Gaming Platforms</a>
+            <i class="fas fa-share-alt"></i></li>
+          <li class=""><a data-pjax="data-pjax" href="/password/change">Password</a>
+            <i class="fas fa-lock"></i></li>
+          <li class=""><a data-pjax="data-pjax" href="/account/preferences">User Preferences</a>
+            <i class="far fa-envelope"></i></li>
+          <li class=""><a href="/rewards">Rewards</a>
+            <i class="fas fa-gift"></i></li>
+                    <li class="">
+            <a data-pjax="data-pjax" href="/account/other">Other</a><i class="fas fa-shield-alt"></i>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-9" role="main">
+        <div class="content" id="pjax-container">
+          <span class="space-between-container">
+<div class="min-height-container">
+  <div class="shift-secondary-title"><h1>Profile</h1></div>
+
+
+
+
+<form class="edit_user" id="edit_user_13114556" action="/users/13114556" accept-charset="UTF-8" data-remote="true" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="_method" value="patch" />
+<div id="error_messages"></div>
+
+    <div class="main">
+      <div class="shift-secondary-title"><h2>Profile</h2></div>
+      <span class="space-between-container">
+      <h3>Email</h3>
+          <span class="shift-green-text"><span>Verified</span> <span class="shift-check-icon"><img src="/assets/svg_icons/verified-fe3472a5607e7a81ba47b866aa08b2d712efd99648694cc06768dbae30b16673.svg"></span></span>
+    </span>
+
+      <div class="space-between-container">
+        <div class="user_email">
+            <p id="current_email" href="javascript:;">nathaniel.daniel23@outlook.com</p>
+        </div>
+        <div>
+          <div class="user_email_set" style="display:none;"><input class="form-control" type="text" value="nathaniel.daniel23@outlook.com" name="user[email]" id="user_email" /></div>
+        </div>
+        <div class="sh_button_actions">
+          <input type="submit" name="commit" value="Update profile" id="update_profile" class="submit_button user_email_submit" data-disable-with="Update profile" />
+          <input class="user_email_cancel_button cancel-button" style="display: none;" type="button" value="Cancel">
+          <span class="user_email_edit_button shift-edit-button" data-must-confirm="false" > Edit</span>
+        </div>
+      </div>
+
+      <div class="email_change_pending" style="display: none;">
+        An email change has been requested. Please check your email for confirmation. Click <a id="cancel_change_email" href="javascript:;">here</a> to cancel this email change.
+      </div>
+
+      <div class="shift-cross-line"></div>
+
+      <span class="space-between-container">
+      <h3>Display Name</h3>
+    </span>
+
+      <div class="space-between-container">
+        <div class="user_display_name"><p id="current_display_name" href="javascript:;">adumbidiot</p>
+        </div>
+        <div class="user_display_name_set" style="display:none;"><input class="form-control" type="text" value="adumbidiot" name="user[display_name]" id="user_display_name" />
+          <div class="explanation">
+            <ul>
+              <li>Must be unique.</li><li>Must start with a letter.</li><li>Must be between 3 and 16 characters.</li><li>Can contain 0-9, A-Z, a-z, and non-consecutive hyphen, underscore, or period characters.</li><li>If you change your display_name, all prior forum quotes of your posts and @name mentions will be broken.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="sh_button_actions">
+          <input type="submit" name="commit" value="Update profile" id="update_profile" class="submit_button user_display_name_submit" data-disable-with="Update profile" />
+          <input class="user_display_name_cancel_button cancel-button" style="display: none;" type="button" value="Cancel">
+          <span class="user_display_name_edit_button shift-edit-button" >Edit</span>
+        </div>
+      </div>
+
+      <div class="shift-cross-line"></div>
+
+      <span class="space-between-container">
+      <h3>Name</h3>
+    </span>
+
+      <div class="space-between-container">
+          <div class="user_first_name"><p id="current_first_name">Nathaniel</p></div>
+        <div class="user_first_name_set" style="display:none;"><input class="form-control" id="set_first_name" placeholder="Set first name" type="text" value="Nathaniel" name="user[first_name]" /></div>
+        <div class="sh_button_actions">
+          <input type=

@@ -1,0 +1,27 @@
+[package]
+name = "shift-client"
+version = "0.0.1"
+authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
+edition = "2018"
+
+[[bin]]         
+name = "shift-client"    
+required-features = [ "cli" ]
+
+[dependencies]
+reqwest = { version = "0.10.4", features = [ "cookies" ] }
+select = "0.4.3"
+serde = { version = "1.0.110", features = [ "derive" ] }
+serde_json = "1.0.53"
+shift-orcz = { path = "lib/shift-orcz", optional = true }
+tokio = { version = "0.2.21", features = [ "time" ] }
+
+[dev-dependencies]
+tokio = { version = "0.2.21", features = [ "macros" ] }
+
+[features]
+default = []
+cli = [ "shift-orcz", "tokio/macros" ]
+
+[workspace]
+members = [ "lib/shift-orcz" ]
