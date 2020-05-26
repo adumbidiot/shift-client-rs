@@ -25,7 +25,7 @@ impl HomePage {
 mod test {
     use super::*;
 
-    const SAMPLE_1: &str = include_str!("home.html");
+    const SAMPLE_1: &str = include_str!("../../test_data/home.html");
 
     #[test]
     fn sample_1() {

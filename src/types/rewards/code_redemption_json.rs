@@ -29,8 +29,8 @@ impl CodeRedemptionJson {
 mod test {
     use super::*;
 
-    const SAMPLE_1: &str = include_str!("code_redemption_json_1.json");
-    const SAMPLE_2: &str = include_str!("code_redemption_json_2.json");
+    const SAMPLE_1: &str = include_str!("../../../test_data/code_redemption_json_1.json");
+    const SAMPLE_2: &str = include_str!("../../../test_data/code_redemption_json_2.json");
 
     #[test]
     fn sample_1() {

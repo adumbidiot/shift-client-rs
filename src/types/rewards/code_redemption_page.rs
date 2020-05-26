@@ -40,7 +40,7 @@ impl CodeRedemptionPage {
 mod test {
     use super::*;
 
-    const SAMPLE_1: &str = include_str!("code_redemption_page_html.html");
+    const SAMPLE_1: &str = include_str!("../../../test_data/code_redemption_page_html.html");
 
     #[test]
     fn sample_1() {

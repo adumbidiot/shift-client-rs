@@ -60,7 +60,7 @@ fn get_text_by_id<'a>(doc: &'a Document, id: &str) -> Option<&'a str> {
 mod test {
     use super::*;
 
-    const SAMPLE_1: &str = include_str!("account.html");
+    const SAMPLE_1: &str = include_str!("../../test_data/account.html");
 
     #[test]
     fn sample_1() {

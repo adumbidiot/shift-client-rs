@@ -90,7 +90,7 @@ impl RewardForm {
 #[cfg(test)]
 mod test {
     use super::*;
-    const SAMPLE_1: &str = include_str!("reward_form_1.html");
+    const SAMPLE_1: &str = include_str!("../../../test_data/reward_form_1.html");
 
     #[test]
     fn sampe_1() {
