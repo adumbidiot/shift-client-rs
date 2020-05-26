@@ -2,10 +2,10 @@ pub mod code;
 mod game;
 pub mod shift_code;
 
-use crate::shift_code::ShiftCode;
 pub use crate::{
     code::Code,
     game::Game,
+    shift_code::ShiftCode,
 };
 use chrono::NaiveDate;
 use select::{
@@ -29,7 +29,7 @@ impl From<reqwest::Error> for OrczError {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Client {
     client: reqwest::Client,
 }
