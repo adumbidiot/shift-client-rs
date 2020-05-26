@@ -35,7 +35,7 @@ impl RewardsPage {
 mod test {
     use super::*;
 
-    const SAMPLE_1: &str = include_str!("rewards_page_1.html");
+    const SAMPLE_1: &str = include_str!("../../../test_data/rewards_page_1.html");
 
     #[test]
     fn sample_1() {
