@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 chrono = "0.4.11"
 logos = "0.11.4"
-reqwest = "0.10.4"
+reqwest = "0.10.5"
 select = "0.4.3"
 
 [dev-dependencies]
