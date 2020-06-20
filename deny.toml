@@ -1,0 +1,97 @@
+targets = [
+    { triple = "x86_64-unknown-linux-gnu" },
+    { triple = "x86_64-unknown-linux-musl" },
+    { triple = "x86_64-apple-darwin" },
+    { triple = "x86_64-pc-windows-msvc" },
+]
+
+[advisories]
+vulnerability = "deny"
+unmaintained = "deny"
+notice = "deny"
+ignore = [    
+    # blocked on tokio bumping mio to 0.7
+    "RUSTSEC-2020-0016",
+]
+
+[licenses]
+unlicensed = "deny"
+copyleft = "deny"
+allow-osi-fsf-free = "neither"
+confidence-threshold = 0.93
+default = "deny"
+private = { ignore = true }
+allow = [ "Apache-2.0", "MIT", "Unlicense" ]
+exceptions = []
+
+[[licenses.clarify]]
+name = "ring"
+expression = "MIT AND ISC AND OpenSSL"
+license-files = [
+    { path = "LICENSE", hash = 0xbd0eed23 },
+]
+
+[[licenses.clarify]]
+name = "webpki"
+expression = "ISC"
+license-files = [
+    { path = "LICENSE", hash = 0x001c7e6c },
+]
+
+[bans]
+multiple-versions = "warn"
+highlight = "all"
+skip = [
+    # blocked on tokio bumping mio to 0.7
+    { name = "winapi", version = "0.2.8" },
+    
+    # blocked on select bumping html5ever to 0.25.0
+    { name = "autocfg", version = "0.1.7" },
+    { name = "proc-macro2", version = "0.4.30" },
+    { name = "quote", version = "0.6.13" },
+    { name = "rand", version = "0.6.5" },
+    { name = "rand_chacha", version = "0.1.1" },
+    { name = "rand_core", version = "0.4.2" },
+    { name = "rand_core", version = "0.3.1" },
+    { name = "unicode-xid", version = "0.1.0" },
+    { name = "syn", version = "0.15.44" },
+    
+    # Blocked on reqwest bumping cookie to 0.13 or above
+    { name = "url", version = "1.7.2" },    
+    { name = "percent-encoding", version = "1.0.1" },
+    { name = "idna", version = "0.1.5" },
+]
+
+# Mostly soundness denies since the advisory lacks a section for soundess bugs
+deny = [
+    # https://github.com/RustSec/advisory-db/issues/298
+    { name = "linked-hash-map", version = "<0.5.3" },
+    
+    # https://github.com/RustSec/advisory-db/pull/290
+    { name = "bigint", version = "*" },
+    
+    # https://github.com/RustSec/advisory-db/pull/293
+    # NOTE: May be sound in the future: https://github.com/RustSec/advisory-db/pull/293#issuecomment-641898680
+    { name = "rio", version = "*" },
+
+    # https://github.com/RustSec/advisory-db/issues/299
+    { name = "smallvec", version = "<0.6.13" },
+    
+    # https://github.com/RustSec/advisory-db/pull/268
+    { name = "plutonium", version = "*" },
+    
+    # https://github.com/RustSec/advisory-db/pull/308
+    { name = "traitobject", version = "*" },
+    
+    # https://github.com/RustSec/advisory-db/issues/305
+    { name = "rental", version = "*" },
+    
+    # Appears to be moving towards integrating rio more tightly for io_uring support
+    { name = "sled", version = "*" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = [ "https://github.com/rust-lang/crates.io-index" ]
+allow-git = []
