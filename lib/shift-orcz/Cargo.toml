@@ -3,6 +3,7 @@ name = "shift-orcz"
 version = "0.0.1"
 authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
 edition = "2018"
+license = "MIT/Apache-2.0"
 
 [dependencies]
 chrono = "0.4.11"
