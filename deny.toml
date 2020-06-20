@@ -21,7 +21,7 @@ allow-osi-fsf-free = "neither"
 confidence-threshold = 0.93
 default = "deny"
 private = { ignore = true }
-allow = [ "Apache-2.0", "MIT", "Unlicense" ]
+allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib" ]
 exceptions = []
 
 [[licenses.clarify]]
