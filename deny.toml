@@ -45,17 +45,6 @@ skip = [
     # blocked on tokio bumping mio to 0.7
     { name = "winapi", version = "0.2.8" },
     
-    # blocked on select bumping html5ever to 0.25.0
-    { name = "autocfg", version = "0.1.7" },
-    { name = "proc-macro2", version = "0.4.30" },
-    { name = "quote", version = "0.6.13" },
-    { name = "rand", version = "0.6.5" },
-    { name = "rand_chacha", version = "0.1.1" },
-    { name = "rand_core", version = "0.4.2" },
-    { name = "rand_core", version = "0.3.1" },
-    { name = "unicode-xid", version = "0.1.0" },
-    { name = "syn", version = "0.15.44" },
-    
     # Blocked on reqwest bumping cookie to 0.13 or above
     { name = "url", version = "1.7.2" },    
     { name = "percent-encoding", version = "1.0.1" },
