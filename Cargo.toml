@@ -12,7 +12,7 @@ required-features = [ "cli" ]
 [dependencies]
 reqwest = { version = "0.10.8", features = [ "cookies" ] }
 select = "0.5.0"
-serde = { version = "1.0.116", features = [ "derive" ] }
+serde = { version = "1.0.117", features = [ "derive" ] }
 serde_json = "1.0.59"
 shift-orcz = { path = "lib/shift-orcz", optional = true }
 tokio = { version = "0.2.22", features = [ "time" ] }
