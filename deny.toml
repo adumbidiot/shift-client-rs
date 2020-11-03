@@ -39,16 +39,21 @@ license-files = [
 ]
 
 [bans]
-multiple-versions = "warn"
+multiple-versions = "deny"
 highlight = "all"
 skip = [
     # blocked on tokio bumping mio to 0.7
     { name = "winapi", version = "0.2.8" },
     
-    # Blocked on reqwest bumping cookie to 0.13 or above
-    { name = "url", version = "1.7.2" },    
-    { name = "percent-encoding", version = "1.0.1" },
-    { name = "idna", version = "0.1.5" },
+    # Blocked on xml5ever bumping time to 0.2.x
+    { name = "time", version = "0.1.44" },
+    
+    # Blocked on tracing-futures bumping pin-project to 1.0.x
+    { name = "pin-project", version = "0.4.27" },
+    { name = "pin-project-internal", version = "0.4.27" },
+    
+    # Blocked on getrandom, log, mio, net2, openssl, socket2, tempfile, and tracing bumping cfg-if to 1.0.x
+    { name = "cfg-if", version = "0.1.10" },
 ]
 
 # Mostly soundness denies since the advisory lacks a section for soundess bugs
