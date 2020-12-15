@@ -52,6 +52,9 @@ skip = [
     { name = "pin-project", version = "0.4.27" },
     { name = "pin-project-internal", version = "0.4.27" },
     
+    # Blocked on tokio bumping pin-project-lite to 0.2.x
+    { name = "pin-project-lite", version = "0.1.11" },
+    
     # Blocked on getrandom, log, mio, net2, openssl, socket2, tempfile, and tracing bumping cfg-if to 1.0.x
     { name = "cfg-if", version = "0.1.10" },
 ]
