@@ -10,7 +10,7 @@ name = "shift-client"
 required-features = [ "cli" ]
 
 [dependencies]
-reqwest = { version = "0.10.10", features = [ "cookies" ] }
+reqwest = { version = "0.11.0", features = [ "cookies" ] }
 select = "0.5.0"
 serde = { version = "1.0.117", features = [ "derive" ] }
 serde_json = "1.0.61"
