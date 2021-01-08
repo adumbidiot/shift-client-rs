@@ -9,10 +9,7 @@ targets = [
 vulnerability = "deny"
 unmaintained = "deny"
 notice = "deny"
-ignore = [    
-    # blocked on tokio bumping mio to 0.7
-    "RUSTSEC-2020-0016",
-]
+ignore = []
 
 [licenses]
 unlicensed = "deny"
@@ -41,10 +38,7 @@ license-files = [
 [bans]
 multiple-versions = "deny"
 highlight = "all"
-skip = [
-    # blocked on tokio bumping mio to 0.7
-    { name = "winapi", version = "0.2.8" },
-    
+skip = [    
     # Blocked on xml5ever bumping time to 0.2.x
     { name = "time", version = "0.1.44" },
     
@@ -52,11 +46,11 @@ skip = [
     { name = "pin-project", version = "0.4.27" },
     { name = "pin-project-internal", version = "0.4.27" },
     
-    # Blocked on tokio bumping pin-project-lite to 0.2.x
-    { name = "pin-project-lite", version = "0.1.11" },
-    
     # Blocked on getrandom, log, mio, net2, openssl, socket2, tempfile, and tracing bumping cfg-if to 1.0.x
     { name = "cfg-if", version = "0.1.10" },
+    
+    # Blocked on http updating bytes to 1.0.x
+    { name = "bytes", version = "1.0.0" },
 ]
 
 # Mostly soundness denies since the advisory lacks a section for soundess bugs
