@@ -15,7 +15,7 @@ pub const PC_CODE_INDEX: usize = 0;
 pub const PLAYSTATION_CODE_INDEX: usize = 1;
 pub const XBOX_CODE_INDEX: usize = 2;
 
-// TODO: Needs overhaul to properly support bl3 instead of mashing bl3 into bl2-like stats
+/// TODO: Needs overhaul to properly support bl3 instead of mashing bl3 into bl2-like stats
 #[derive(Debug)]
 pub struct ShiftCode {
     pub source: String,
@@ -39,7 +39,7 @@ impl ShiftCode {
             .trim()
             .to_string();
 
-        let rewards = process_rewards_node(iter.next()?)?;
+        let rewards = process_rewards_node(iter.next()?);
 
         let issue_date_str = iter.next()?.find(Text).next()?.as_text()?.trim();
         let issue_date = parse_issue_date(issue_date_str).ok()?;
@@ -72,7 +72,7 @@ impl ShiftCode {
             .trim()
             .to_string();
 
-        let rewards = process_rewards_node(iter.next()?)?;
+        let rewards = process_rewards_node(iter.next()?);
 
         let issue_date_str = iter.next()?.find(Text).next()?.as_text()?.trim();
         let issue_date = parse_issue_date(issue_date_str).ok()?;
@@ -113,7 +113,7 @@ impl ShiftCode {
     }
 }
 
-fn process_rewards_node(n: Node) -> Option<String> {
+fn process_rewards_node(n: Node) -> String {
     let mut ret = n
         .find(Text)
         .filter_map(|text| text.as_text())
@@ -128,5 +128,5 @@ fn process_rewards_node(n: Node) -> Option<String> {
         ret.pop();
     }
 
-    Some(ret)
+    ret
 }

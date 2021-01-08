@@ -1,3 +1,4 @@
+/// Borderlands Games
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Game {
     Borderlands,
@@ -7,6 +8,7 @@ pub enum Game {
 }
 
 impl Game {
+    /// Get the orcz page url
     pub(crate) fn page_url(&self) -> &'static str {
         match self {
             Self::Borderlands => "http://orcz.com/Borderlands:_Golden_Key",
@@ -16,10 +18,8 @@ impl Game {
         }
     }
 
+    /// Check whether this game is bl3
     pub fn is_bl3(self) -> bool {
-        match self {
-            Self::Borderlands3 => true,
-            _ => false,
-        }
+        matches!(self, Self::Borderlands3)
     }
 }
