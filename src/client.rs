@@ -15,9 +15,12 @@ use crate::{
     },
 };
 use select::document::Document;
-use std::sync::{
-    Arc,
-    RwLock,
+use std::{
+    sync::{
+        Arc,
+        RwLock,
+    },
+    time::Duration,
 };
 
 const HOME_URL: &str = "https://shift.gearboxsoftware.com/home";
@@ -189,7 +192,7 @@ impl Client {
             let body = res.text().await?;
             let json: CodeRedemptionJson = serde_json::from_str(&body)?;
 
-            tokio::time::delay_for(std::time::Duration::from_secs(2)).await;
+            tokio::time::sleep(Duration::from_secs(2)).await;
 
             if !json.in_progress() {
                 break json;
