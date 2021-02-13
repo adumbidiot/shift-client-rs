@@ -46,11 +46,14 @@ skip = [
     { name = "pin-project", version = "0.4.27" },
     { name = "pin-project-internal", version = "0.4.27" },
     
-    # Blocked on getrandom, log, mio, net2, openssl, socket2, tempfile, and tracing bumping cfg-if to 1.0.x
-    { name = "cfg-if", version = "0.1.10" },
-    
     # Blocked on http updating bytes to 1.0.x
     { name = "bytes", version = "1.0.0" },
+    
+    # Blocked on phf_generator updating rand to 0.8.x
+    { name = "getrandom", version = "0.1.16" },
+    { name = "rand_core", version = "0.5.1" },
+    { name = "rand_chacha", version = "0.2.2" },
+    { name = "rand", version = "0.7.3" },
 ]
 
 # Mostly soundness denies since the advisory lacks a section for soundess bugs
