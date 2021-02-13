@@ -25,7 +25,7 @@ pub enum OrczError {
     ///
     #[error("{0}")]
     Reqwest(#[from] reqwest::Error),
-    
+
     /// Invalid HTTP StatusCode
     ///
     #[error("invalid status '{0}'")]
