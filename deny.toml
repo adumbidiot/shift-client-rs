@@ -42,10 +42,6 @@ skip = [
     # Blocked on xml5ever bumping time to 0.2.x
     { name = "time", version = "0.1.44" },
     
-    # Blocked on tracing-futures bumping pin-project to 1.0.x
-    { name = "pin-project", version = "0.4.27" },
-    { name = "pin-project-internal", version = "0.4.27" },
-    
     # Blocked on http updating bytes to 1.0.x
     { name = "bytes", version = "1.0.0" },
     
