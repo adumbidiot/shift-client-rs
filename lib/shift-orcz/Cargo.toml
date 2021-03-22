@@ -13,4 +13,4 @@ select = "0.5.0"
 thiserror = "1.0.23"
 
 [dev-dependencies]
-tokio = { version = "1.2.0", features = [ "macros" ] }
+tokio = { version = "1.4.0", features = [ "macros" ] }
