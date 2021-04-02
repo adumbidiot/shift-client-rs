@@ -36,15 +36,12 @@ pub enum OrczError {
 mod tests {
     use super::*;
 
-    // Someone nuked the table online. Allow failure until fixed.
-    /*
     #[tokio::test]
     async fn it_works_bl() {
         let client = Client::new();
         let codes = client.get_shift_codes(Game::Borderlands).await.unwrap();
         dbg!(codes);
     }
-    */
 
     #[tokio::test]
     async fn it_works_bl2() {
