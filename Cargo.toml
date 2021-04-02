@@ -1,6 +1,6 @@
 [package]
 name = "shift-client"
-version = "0.0.1"
+version = "0.0.0"
 authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
 edition = "2018"
 license = "MIT/Apache-2.0"
@@ -22,7 +22,11 @@ tokio = { version = "1.4.0", features = [ "macros" ] }
 
 [features]
 default = []
-cli = [ "shift-orcz", "tokio/macros" ]
+cli = [ 
+    "shift-orcz", 
+    "tokio/macros",
+    "tokio/rt-multi-thread"
+]
 
 [workspace]
 members = [ "lib/shift-orcz" ]
