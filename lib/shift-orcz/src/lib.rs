@@ -17,19 +17,22 @@ pub type OrczResult<T> = Result<T, OrczError>;
 #[derive(Debug, thiserror::Error)]
 pub enum OrczError {
     /// Reqwest HTTP Error
-    ///
     #[error("{0}")]
     Reqwest(#[from] reqwest::Error),
 
     /// Invalid HTTP StatusCode
-    ///
     #[error("invalid status '{0}'")]
     InvalidStatus(reqwest::StatusCode),
 
     /// Error Parsing a Table
+    ///
     /// This is usually a library error; update this lib.
     #[error("invalid table")]
     TableParse,
+
+    /// a tokio task failed
+    #[error("{0}")]
+    TokioJoin(#[from] tokio::task::JoinError),
 }
 
 #[cfg(test)]

@@ -1,20 +1,20 @@
-use select::{
-    node::Node,
-    predicate::{
-        And,
-        Attr,
-        Name,
-        Text,
-    },
+use scraper::{
+    ElementRef,
+    Selector,
 };
 
+/// A Shift Code
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Code {
+    /// A valid code
     Valid(String),
+
+    /// An invalid code
     Expired(String),
 }
 
 impl Code {
+    /// Is this code valid?
     pub fn is_valid(&self) -> bool {
         match self {
             Self::Valid(_) => true,
@@ -22,6 +22,7 @@ impl Code {
         }
     }
 
+    /// Is this code expired?
     pub fn is_expired(&self) -> bool {
         match self {
             Self::Valid(_) => false,
@@ -29,6 +30,7 @@ impl Code {
         }
     }
 
+    /// Get this code as a string
     pub fn as_str(&self) -> &str {
         match self {
             Self::Valid(s) => s.as_str(),
@@ -36,6 +38,7 @@ impl Code {
         }
     }
 
+    /// Get this code as a mutable string
     pub fn as_mut_string(&mut self) -> &mut String {
         match self {
             Self::Valid(s) => s,
@@ -43,18 +46,19 @@ impl Code {
         }
     }
 
-    pub(crate) fn from_node(node: Node) -> Option<Self> {
-        let maybe_span = node
-            .find(And(Name("span"), Attr("style", "color:red")))
-            .next();
+    /// Parse this code from an element
+    pub(crate) fn from_element(element: ElementRef) -> Option<Self> {
+        let span_selector =
+            Selector::parse("span[style=\"color:red\"]").expect("invalid span selector");
+        let maybe_span = element.select(&span_selector).next();
 
         match maybe_span {
             Some(el) => {
-                let code = el.find(Text).next()?.as_text()?.trim();
+                let code = el.text().next()?.trim();
                 Some(Self::Expired(code.into()))
             }
             None => {
-                let code = node.find(Text).next()?.as_text()?.trim();
+                let code = element.text().next()?.trim();
                 Some(Self::Valid(code.into()))
             }
         }

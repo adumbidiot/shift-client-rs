@@ -5,9 +5,9 @@ use crate::{
     ShiftCode,
 };
 use chrono::NaiveDate;
-use select::{
-    document::Document,
-    predicate::Name,
+use scraper::{
+    Html,
+    Selector,
 };
 
 /// Client
@@ -24,42 +24,53 @@ impl Client {
         }
     }
 
-    /// Make a doc from the provided url str
+    /// Make a [`Html`] from the provided url str, processing it with f on a threadpool.
     ///
     /// # Errors
     /// Returns an error if the website could not be fetched
-    async fn get_doc(&self, url: &str) -> OrczResult<Document> {
+    async fn get_html<F, T>(&self, url: &str, f: F) -> OrczResult<T>
+    where
+        F: Fn(Html) -> OrczResult<T> + Send + 'static,
+        T: Send + 'static,
+    {
         let res = self.client.get(url).send().await?;
         let status = res.status();
         if !status.is_success() {
             return Err(OrczError::InvalidStatus(status));
         }
         let text = res.text().await?;
-        Ok(Document::from(text.as_str()))
+        Ok(tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??)
     }
 
     /// Get the shift codes for a given game
     pub async fn get_shift_codes(&self, game: Game) -> OrczResult<Vec<ShiftCode>> {
-        let doc = self.get_doc(game.page_url()).await?;
-        extract_shift_codes(&doc, game).ok_or(OrczError::TableParse)
+        Ok(self
+            .get_html(game.page_url(), move |html| {
+                extract_shift_codes(&html, game).ok_or(OrczError::TableParse)
+            })
+            .await?)
     }
 }
 
-fn extract_shift_codes(doc: &Document, game: Game) -> Option<Vec<ShiftCode>> {
-    let table = doc.find(Name("table")).next()?;
-    let table_body = table.find(Name("tbody")).next()?;
+fn extract_shift_codes(html: &Html, game: Game) -> Option<Vec<ShiftCode>> {
+    let table_selector = Selector::parse("table").expect("invalid table selector");
+    let table = html.select(&table_selector).next()?;
 
+    let table_body_selector = Selector::parse("tbody").expect("invalid table body selector");
+    let table_body = table.select(&table_body_selector).next()?;
+
+    let row_selector = Selector::parse("tr").expect("invalid row selector");
     let mut ret = if game.is_bl3() {
         table_body
-            .find(Name("tr"))
+            .select(&row_selector)
             .skip(1) // Skip title
-            .map(ShiftCode::from_node_bl3)
+            .map(ShiftCode::from_element_bl3)
             .collect::<Option<Vec<_>>>()?
     } else {
         table_body
-            .find(Name("tr"))
+            .select(&row_selector)
             .skip(1) // Skip title
-            .map(ShiftCode::from_node)
+            .map(ShiftCode::from_element)
             .collect::<Option<Vec<_>>>()?
     };
 
@@ -116,29 +127,34 @@ mod test {
 
     #[test]
     fn parse_bl() {
-        let doc = Document::from(BL_DOC);
-        let codes = extract_shift_codes(&doc, Game::Borderlands).unwrap();
+        let html = Html::parse_document(BL_DOC);
+        let codes = extract_shift_codes(&html, Game::Borderlands).expect("bl parse failed");
+        assert!(!codes.is_empty());
         dbg!(codes);
     }
 
     #[test]
     fn parse_bl2() {
-        let doc = Document::from(BL2_DOC);
-        let codes = extract_shift_codes(&doc, Game::Borderlands2).unwrap();
+        let html = Html::parse_document(BL2_DOC);
+        let codes = extract_shift_codes(&html, Game::Borderlands2).expect("bl2 parse failed");
+        assert!(!codes.is_empty());
         dbg!(codes);
     }
 
     #[test]
     fn parse_blps() {
-        let doc = Document::from(BLPS_DOC);
-        let codes = extract_shift_codes(&doc, Game::BorderlandsPreSequel).unwrap();
+        let html = Html::parse_document(BLPS_DOC);
+        let codes =
+            extract_shift_codes(&html, Game::BorderlandsPreSequel).expect("blps parse failed");
+        assert!(!codes.is_empty());
         dbg!(codes);
     }
 
     #[test]
     fn parse_bl3() {
-        let doc = Document::from(BL3_DOC);
-        let codes = extract_shift_codes(&doc, Game::Borderlands3).unwrap();
-        dbg!(codes);
+        let html = Html::parse_document(BL3_DOC);
+        let codes = extract_shift_codes(&html, Game::Borderlands3).expect("bl3 parse failed");
+        assert!(!codes.is_empty());
+        dbg!(&codes);
     }
 }

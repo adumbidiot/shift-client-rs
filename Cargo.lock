@@ -1203,7 +1203,6 @@ dependencies = [
  "logos",
  "reqwest",
  "scraper",
- "select",
  "thiserror",
  "tokio",
 ]
