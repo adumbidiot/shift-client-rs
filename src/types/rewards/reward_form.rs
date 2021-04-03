@@ -34,6 +34,7 @@ pub enum FromNodeError {
     MissingCommit,
 }
 
+/// The reward form
 #[derive(Debug, serde::Serialize)]
 pub struct RewardForm {
     utf8: String,
@@ -55,10 +56,12 @@ pub struct RewardForm {
 }
 
 impl RewardForm {
+    /// Parse a [`RewardForm`] from html
     pub(crate) fn from_doc(doc: &Document) -> Result<Vec<Self>, FromDocError> {
         doc.find(Name("form")).map(RewardForm::from_node).collect()
     }
 
+    /// Parse a [`RewardForm`] from a node.
     pub(crate) fn from_node(el: Node) -> Result<Self, FromNodeError> {
         let utf8 = extract_name_value(el, "utf8")
             .ok_or(FromNodeError::MissingUtf8)?

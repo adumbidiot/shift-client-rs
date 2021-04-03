@@ -51,4 +51,8 @@ pub enum ShiftError {
     /// Unavailable ShiftCode
     #[error("unavailable shift code")]
     UnavailableShiftCode,
+
+    /// Failed to join tokio task
+    #[error("{0}")]
+    TokioJoin(#[from] tokio::task::JoinError),
 }

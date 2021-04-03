@@ -30,4 +30,6 @@ cli = [
 ]
 
 [workspace]
-members = [ "lib/shift-orcz" ]
+members = [ 
+    "lib/shift-orcz" 
+]
