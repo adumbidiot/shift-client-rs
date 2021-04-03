@@ -1,19 +1,18 @@
-use select::{
-    document::Document,
-    node::Node,
-    predicate::{
-        And,
-        Attr,
-        Name,
-    },
+use scraper::{
+    ElementRef,
+    Html,
+    Selector,
 };
 
-pub(crate) fn extract_name_value<'a>(node: Node<'a>, name: &str) -> Option<&'a str> {
-    node.find(Attr("name", name)).next()?.attr("value")
+/// Extract the value of an element by the name attr
+pub(crate) fn extract_by_name<'a>(element: ElementRef<'a>, name: &str) -> Option<&'a str> {
+    let selector = Selector::parse(&format!("[name=\"{}\"][value]", name)).ok()?;
+    element.select(&selector).next()?.value().attr("value")
 }
 
-pub(crate) fn extract_csrf_token(doc: &Document) -> Option<&str> {
-    doc.find(And(Name("meta"), Attr("name", "csrf-token")))
-        .next()?
-        .attr("content")
+/// Extract the csrf token
+pub(crate) fn extract_csrf_token(html: &Html) -> Option<&str> {
+    let selector =
+        Selector::parse("meta[name=\"csrf-token\"][content]").expect("invalid csrf selector");
+    html.select(&selector).next()?.value().attr("content")
 }

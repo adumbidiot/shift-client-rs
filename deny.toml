@@ -18,7 +18,7 @@ allow-osi-fsf-free = "neither"
 confidence-threshold = 0.93
 default = "deny"
 private = { ignore = true }
-allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib" ]
+allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC" ]
 exceptions = []
 
 [[licenses.clarify]]
@@ -78,6 +78,14 @@ deny = [
     
     # Appears to be moving towards integrating rio more tightly for io_uring support
     { name = "sled", version = "*" },
+    
+    # The general idea seems unsound, and the current version does contain UB.
+    # https://github.com/Kimundi/owning-ref-rs/issues/71
+    { name = "owning_ref", version = "*" },
+    
+    # It's a crate only intended for testing; people insist on using it for some reason.
+    # https://crates.io/crates/markup5ever_rcdom/0.1.0
+    { name = "markup5ever_rcdom", version = "0.1.0" },
 ]
 
 [sources]

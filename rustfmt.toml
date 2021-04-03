@@ -1,2 +1,2 @@
 imports_layout = "vertical"
-merge_imports = true
+imports_granularity="Crate"

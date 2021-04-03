@@ -1,23 +1,40 @@
-use crate::util::extract_name_value;
-use select::{
-    document::Document,
-    node::Node,
-    predicate::Name,
+use crate::util::extract_by_name;
+use scraper::{
+    ElementRef,
+    Html,
+    Selector,
 };
 
-pub type FromDocError = FromNodeError;
+/// Error that may occur while parsing a [`RewardForm`].
+pub type FromHtmlError = FromElementError;
 
-#[derive(Debug)]
-pub enum FromNodeError {
+/// Error that may occur while parsing a [`RewardForm`].
+#[derive(Debug, thiserror::Error)]
+pub enum FromElementError {
+    /// ?
+    #[error("missing utf8")]
     MissingUtf8,
+    /// Missing auth token
+    #[error("missing auth token")]
     MissingAuthToken,
+    /// Missing code
+    #[error("missing code")]
     MissingCode,
+    /// Missing check
+    #[error("missing check")]
     MissingCheck,
+    /// Missing service
+    #[error("missing service")]
     MissingService,
+    /// Missing title
+    #[error("missing title")]
     MissingTitle,
+    /// Missing commit
+    #[error("missing commit")]
     MissingCommit,
 }
 
+/// The reward form
 #[derive(Debug, serde::Serialize)]
 pub struct RewardForm {
     utf8: String,
@@ -39,40 +56,46 @@ pub struct RewardForm {
 }
 
 impl RewardForm {
-    pub(crate) fn from_doc(doc: &Document) -> Result<Vec<Self>, FromDocError> {
-        doc.find(Name("form")).map(RewardForm::from_node).collect()
+    /// Parse a [`RewardForm`] from html
+    pub(crate) fn from_html(html: &Html) -> Result<Vec<Self>, FromHtmlError> {
+        let form_selector = Selector::parse("form").expect("invalid form selector");
+        html.select(&form_selector)
+            .map(RewardForm::from_element)
+            .collect()
     }
 
-    pub(crate) fn from_node(el: Node) -> Result<Self, FromNodeError> {
-        let utf8 = extract_name_value(el, "utf8")
-            .ok_or(FromNodeError::MissingUtf8)?
+    /// Parse a [`RewardForm`] from a node.
+    pub(crate) fn from_element(element: ElementRef) -> Result<Self, FromElementError> {
+        let utf8 = extract_by_name(element, "utf8")
+            .ok_or(FromElementError::MissingUtf8)?
             .to_string();
 
-        let authenticity_token = extract_name_value(el, "authenticity_token")
-            .ok_or(FromNodeError::MissingAuthToken)?
+        let authenticity_token = extract_by_name(element, "authenticity_token")
+            .ok_or(FromElementError::MissingAuthToken)?
             .to_string();
 
-        let archway_code_redemption_code = extract_name_value(el, "archway_code_redemption[code]")
-            .ok_or(FromNodeError::MissingCode)?
-            .to_string();
+        let archway_code_redemption_code =
+            extract_by_name(element, "archway_code_redemption[code]")
+                .ok_or(FromElementError::MissingCode)?
+                .to_string();
 
         let archway_code_redemption_check =
-            extract_name_value(el, "archway_code_redemption[check]")
-                .ok_or(FromNodeError::MissingCheck)?
+            extract_by_name(element, "archway_code_redemption[check]")
+                .ok_or(FromElementError::MissingCheck)?
                 .to_string();
 
         let archway_code_redemption_service =
-            extract_name_value(el, "archway_code_redemption[service]")
-                .ok_or(FromNodeError::MissingService)?
+            extract_by_name(element, "archway_code_redemption[service]")
+                .ok_or(FromElementError::MissingService)?
                 .to_string();
 
         let archway_code_redemption_title =
-            extract_name_value(el, "archway_code_redemption[title]")
-                .ok_or(FromNodeError::MissingTitle)?
+            extract_by_name(element, "archway_code_redemption[title]")
+                .ok_or(FromElementError::MissingTitle)?
                 .to_string();
 
-        let commit = extract_name_value(el, "commit")
-            .ok_or(FromNodeError::MissingCommit)?
+        let commit = extract_by_name(element, "commit")
+            .ok_or(FromElementError::MissingCommit)?
             .to_string();
 
         Ok(Self {
@@ -94,7 +117,7 @@ mod test {
 
     #[test]
     fn sampe_1() {
-        let doc = Document::from(SAMPLE_1);
-        let _form = RewardForm::from_doc(&doc).unwrap();
+        let doc = Html::parse_document(SAMPLE_1);
+        let _form = RewardForm::from_html(&doc).expect("Failed to parse reward form");
     }
 }

@@ -23,11 +23,7 @@ pub fn input() -> String {
 }
 
 pub fn input_yn() -> bool {
-    let input = input();
-    match input.chars().next() {
-        Some('Y') | Some('y') => true,
-        _ => false,
-    }
+    matches!(input().chars().next(), Some('Y') | Some('y'))
 }
 
 async fn manual_loop(client: &Client) {

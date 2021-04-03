@@ -1,20 +1,26 @@
 use crate::util::extract_csrf_token;
-use select::document::Document;
+use scraper::Html;
 
-#[derive(Debug)]
-pub enum FromDocError {
+/// Error that may occur while parsing a [`HomePage`].
+#[derive(Debug, thiserror::Error)]
+pub enum FromHtmlError {
+    /// Missing csrf token
+    #[error("missing csrf token")]
     MissingCsrfToken,
 }
 
+/// The home page
 #[derive(Debug)]
 pub struct HomePage {
+    /// The csrf token
     pub csrf_token: String,
 }
 
 impl HomePage {
-    pub(crate) fn from_doc(doc: &Document) -> Result<Self, FromDocError> {
-        let csrf_token = extract_csrf_token(doc)
-            .ok_or(FromDocError::MissingCsrfToken)?
+    /// Parse a [`HomePage`] from html
+    pub(crate) fn from_html(html: &Html) -> Result<Self, FromHtmlError> {
+        let csrf_token = extract_csrf_token(html)
+            .ok_or(FromHtmlError::MissingCsrfToken)?
             .to_string();
 
         Ok(Self { csrf_token })
@@ -29,7 +35,7 @@ mod test {
 
     #[test]
     fn sample_1() {
-        let doc = Document::from(SAMPLE_1);
-        let _page = HomePage::from_doc(&doc).unwrap();
+        let html = Html::parse_document(SAMPLE_1);
+        let _page = HomePage::from_html(&html).expect("failed to parse home page");
     }
 }

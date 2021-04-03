@@ -1,44 +1,56 @@
 use crate::util::extract_csrf_token;
-use select::{
-    document::Document,
-    predicate::{
-        Attr,
-        Text,
-    },
+use scraper::{
+    Html,
+    Selector,
 };
 
-#[derive(Debug)]
-pub enum FromDocError {
+/// Error that may occur while parsing an [`AccountPage`].
+#[derive(Debug, thiserror::Error)]
+pub enum FromHtmlError {
+    /// Missing csrf token
+    #[error("missing csrf token")]
     MissingCsrfToken,
+    /// Missing email
+    #[error("missing email")]
     MissingEmail,
+    /// Missing display name
+    #[error("missing display name")]
     MissingDisplayName,
+    /// Missing first name
+    #[error("missing first name")]
     MissingFirstName,
 }
 
+/// The account page
 #[derive(Debug)]
 pub struct AccountPage {
+    /// The csrf token
     pub csrf_token: String,
+    /// The email
     pub email: String,
+    /// The display name
     pub display_name: String,
+    /// The first name
     pub first_name: String,
 }
 
 impl AccountPage {
-    pub(crate) fn from_doc(doc: &Document) -> Result<Self, FromDocError> {
-        let csrf_token = extract_csrf_token(doc)
-            .ok_or(FromDocError::MissingCsrfToken)?
+    /// Parse an [`AccountPage`] from html
+    pub(crate) fn from_html(html: &Html) -> Result<Self, FromHtmlError> {
+        let csrf_token = extract_csrf_token(html)
+            .ok_or(FromHtmlError::MissingCsrfToken)?
             .to_string();
 
-        let email = get_text_by_id(doc, "current_email")
-            .ok_or(FromDocError::MissingEmail)?
+        let email = get_text_by_id(html, "current_email")
+            .ok_or(FromHtmlError::MissingEmail)?
             .to_string();
 
-        let display_name = get_text_by_id(doc, "current_display_name")
-            .ok_or(FromDocError::MissingDisplayName)?
+        let display_name = get_text_by_id(html, "current_display_name")
+            .ok_or(FromHtmlError::MissingDisplayName)?
             .to_string();
 
-        let first_name = get_text_by_id(doc, "current_first_name")
-            .ok_or(FromDocError::MissingFirstName)?
+        let first_name = get_text_by_id(html, "current_first_name")
+            .ok_or(FromHtmlError::MissingFirstName)?
             .to_string();
 
         Ok(Self {
@@ -50,10 +62,10 @@ impl AccountPage {
     }
 }
 
-fn get_text_by_id<'a>(doc: &'a Document, id: &str) -> Option<&'a str> {
-    doc.find(Attr("id", id))
-        .next()
-        .and_then(|n| n.find(Text).next()?.as_text())
+fn get_text_by_id<'a>(html: &'a Html, id: &str) -> Option<&'a str> {
+    let selector = Selector::parse(&format!("#{}", id)).ok()?;
+    let element = html.select(&selector).next()?;
+    element.text().next()
 }
 
 #[cfg(test)]
@@ -64,8 +76,8 @@ mod test {
 
     #[test]
     fn sample_1() {
-        let doc = Document::from(SAMPLE_1);
-        let page = AccountPage::from_doc(&doc).unwrap();
+        let html = Html::parse_document(SAMPLE_1);
+        let page = AccountPage::from_html(&html).expect("invalid account page");
         dbg!(page);
     }
 }

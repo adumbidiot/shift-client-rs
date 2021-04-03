@@ -14,7 +14,7 @@ use crate::{
         HomePage,
     },
 };
-use select::document::Document;
+use scraper::Html;
 use std::{
     sync::{
         Arc,
@@ -43,7 +43,7 @@ impl Client {
             client: reqwest::Client::builder()
                 .cookie_store(true)
                 .build()
-                .unwrap(),
+                .expect("failed to build reqwest client"),
 
             client_data: Arc::new(RwLock::new(ClientData { email, password })),
         }
@@ -52,22 +52,14 @@ impl Client {
     /// Get the home page. Does not need authentication.
     async fn get_home_page(&self) -> ShiftResult<HomePage> {
         let res = self.client.get(HOME_URL).send().await?;
-
-        let status = res.status();
-        if !status.is_success() {
-            return Err(ShiftError::InvalidStatus(status));
-        }
-
-        let doc = Document::from(res.text().await?.as_str());
-        let home_page = HomePage::from_doc(&doc)?;
-
+        let home_page = res_to_html_transform(res, |html| Ok(HomePage::from_html(&html)?)).await?;
         Ok(home_page)
     }
 
     /// Logs in and allows making other requests
     pub async fn login(&self) -> ShiftResult<AccountPage> {
         let home_page = self.get_home_page().await?;
-        let lock = self.client_data.read().unwrap();
+        let lock = self.client_data.read().expect("client data poisoned");
         let res = self
             .client
             .post(SESSIONS_URL)
@@ -81,11 +73,6 @@ impl Client {
             .send()
             .await?;
 
-        let status = res.status();
-        if !status.is_success() {
-            return Err(ShiftError::InvalidStatus(status));
-        }
-
         match res.url().as_str() {
             header @ "https://shift.gearboxsoftware.com/home?redirect_to=false" => {
                 return Err(ShiftError::InvalidRedirect(header.into()));
@@ -96,24 +83,15 @@ impl Client {
             }
         }
 
-        let body = res.text().await?;
-        let doc = Document::from(body.as_str());
-        let account_page = AccountPage::from_doc(&doc)?;
+        let account_page =
+            res_to_html_transform(res, |html| Ok(AccountPage::from_html(&html)?)).await?;
         Ok(account_page)
     }
 
+    /// Get the [`RewardsPage`]
     pub async fn get_rewards_page(&self) -> ShiftResult<RewardsPage> {
         let res = self.client.get(REWARDS_URL).send().await?;
-
-        let status = res.status();
-        if !status.is_success() {
-            return Err(ShiftError::InvalidStatus(status));
-        }
-
-        let body = res.text().await?;
-        let doc = Document::from(body.as_str());
-        let page = RewardsPage::from_doc(&doc)?;
-
+        let page = res_to_html_transform(res, |html| Ok(RewardsPage::from_html(&html)?)).await?;
         Ok(page)
     }
 
@@ -147,12 +125,16 @@ impl Client {
             _ => {}
         }
 
-        let doc = Document::from(body.as_str());
-        let forms = RewardForm::from_doc(&doc)?;
+        let forms = tokio::task::spawn_blocking(move || {
+            let html = Html::parse_document(body.as_str());
+            RewardForm::from_html(&html)
+        })
+        .await??;
 
         Ok(forms)
     }
 
+    /// Redeem a code
     pub async fn redeem(&self, form: &RewardForm) -> ShiftResult<CodeRedemptionJson> {
         let res = self
             .client
@@ -161,19 +143,13 @@ impl Client {
             .send()
             .await?;
 
-        let status = res.status();
-        if !status.is_success() {
-            return Err(ShiftError::InvalidStatus(status));
-        }
-
         let url = res.url().as_str();
         if !url.starts_with(CODE_REDEMPTIONS_URL) {
             return Err(ShiftError::InvalidRedirect(url.into()));
         }
 
-        let body = res.text().await?;
-        let doc = Document::from(body.as_str());
-        let page = CodeRedemptionPage::from_doc(&doc)?;
+        let page =
+            res_to_html_transform(res, |html| Ok(CodeRedemptionPage::from_html(&html)?)).await?;
 
         let res = loop {
             let res = self
@@ -203,7 +179,24 @@ impl Client {
     }
 }
 
+/// Client data
 struct ClientData {
     email: String,
     password: String,
+}
+
+/// Convert a response to html, then feed it to the given transform function
+async fn res_to_html_transform<F, T>(res: reqwest::Response, f: F) -> ShiftResult<T>
+where
+    F: Fn(Html) -> ShiftResult<T> + Send + 'static,
+    T: Send + 'static,
+{
+    let status = res.status();
+    if !status.is_success() {
+        return Err(ShiftError::InvalidStatus(status));
+    }
+
+    let text = res.text().await?;
+    let ret = tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??;
+    Ok(ret)
 }
