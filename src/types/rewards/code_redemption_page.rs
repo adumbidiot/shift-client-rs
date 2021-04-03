@@ -1,12 +1,12 @@
 use crate::util::extract_csrf_token;
-use select::{
-    document::Document,
-    predicate::Attr,
+use scraper::{
+    Html,
+    Selector,
 };
 
 /// Error that may occur while parsing a [`CodeRedemptionPage`]
 #[derive(Debug, thiserror::Error)]
-pub enum FromDocError {
+pub enum FromHtmlError {
     /// Missing csrf token
     #[error("missing csrf token")]
     MissingCsrfToken,
@@ -27,17 +27,20 @@ pub struct CodeRedemptionPage {
 }
 
 impl CodeRedemptionPage {
-    pub(crate) fn from_doc(doc: &Document) -> Result<Self, FromDocError> {
-        let csrf_token = extract_csrf_token(doc)
-            .ok_or(FromDocError::MissingCsrfToken)?
+    pub(crate) fn from_html(html: &Html) -> Result<Self, FromHtmlError> {
+        let csrf_token = extract_csrf_token(html)
+            .ok_or(FromHtmlError::MissingCsrfToken)?
             .to_string();
 
-        let check_redemption_status_url = doc
-            .find(Attr("id", "check_redemption_status"))
+        let check_redemption_status_url_selector =
+            Selector::parse("#check_redemption_status[data-url]")
+                .expect("invalid check_redemption_status_url selector");
+        let check_redemption_status_url = html
+            .select(&check_redemption_status_url_selector)
             .next()
-            .and_then(|el| el.attr("data-url"))
+            .and_then(|element| element.value().attr("data-url"))
             .map(|url| format!("https://shift.gearboxsoftware.com{}", url))
-            .ok_or(FromDocError::MissingCheckRedemptionStatusUrl)?;
+            .ok_or(FromHtmlError::MissingCheckRedemptionStatusUrl)?;
 
         Ok(Self {
             csrf_token,
@@ -54,7 +57,7 @@ mod test {
 
     #[test]
     fn sample_1() {
-        let doc = Document::from(SAMPLE_1);
-        let _page = CodeRedemptionPage::from_doc(&doc).unwrap();
+        let html = Html::parse_document(SAMPLE_1);
+        let _page = CodeRedemptionPage::from_html(&html).expect("invalid code redemption page");
     }
 }

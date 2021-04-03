@@ -3,11 +3,12 @@ use reqwest::StatusCode;
 /// Library result type
 pub type ShiftResult<T> = Result<T, ShiftError>;
 
-pub type RewardsPageError = crate::types::rewards::rewards_page::FromDocError;
-pub type InvalidHomePageError = crate::types::home_page::FromDocError;
-pub type RewardFormError = crate::types::rewards::reward_form::FromDocError;
-pub type InvalidCodeRedemptionPageError = crate::types::rewards::code_redemption_page::FromDocError;
-pub type InvalidAccountPage = crate::types::account_page::FromDocError;
+pub type RewardsPageError = crate::types::rewards::rewards_page::FromHtmlError;
+pub type InvalidHomePageError = crate::types::home_page::FromHtmlError;
+pub type RewardFormError = crate::types::rewards::reward_form::FromHtmlError;
+pub type InvalidCodeRedemptionPageError =
+    crate::types::rewards::code_redemption_page::FromHtmlError;
+pub type InvalidAccountPage = crate::types::account_page::FromHtmlError;
 
 /// The library error type
 #[derive(Debug, thiserror::Error)]

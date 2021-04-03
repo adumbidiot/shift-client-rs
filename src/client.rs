@@ -14,7 +14,7 @@ use crate::{
         HomePage,
     },
 };
-use select::document::Document;
+use scraper::Html;
 use std::{
     sync::{
         Arc,
@@ -52,7 +52,7 @@ impl Client {
     /// Get the home page. Does not need authentication.
     async fn get_home_page(&self) -> ShiftResult<HomePage> {
         let res = self.client.get(HOME_URL).send().await?;
-        let home_page = res_to_doc_transform(res, |doc| Ok(HomePage::from_doc(&doc)?)).await?;
+        let home_page = res_to_html_transform(res, |html| Ok(HomePage::from_html(&html)?)).await?;
         Ok(home_page)
     }
 
@@ -84,14 +84,14 @@ impl Client {
         }
 
         let account_page =
-            res_to_doc_transform(res, |doc| Ok(AccountPage::from_doc(&doc)?)).await?;
+            res_to_html_transform(res, |html| Ok(AccountPage::from_html(&html)?)).await?;
         Ok(account_page)
     }
 
     /// Get the [`RewardsPage`]
     pub async fn get_rewards_page(&self) -> ShiftResult<RewardsPage> {
         let res = self.client.get(REWARDS_URL).send().await?;
-        let page = res_to_doc_transform(res, |doc| Ok(RewardsPage::from_doc(&doc)?)).await?;
+        let page = res_to_html_transform(res, |html| Ok(RewardsPage::from_html(&html)?)).await?;
         Ok(page)
     }
 
@@ -126,7 +126,8 @@ impl Client {
         }
 
         let forms = tokio::task::spawn_blocking(move || {
-            RewardForm::from_doc(&Document::from(body.as_str()))
+            let html = Html::parse_document(body.as_str());
+            RewardForm::from_html(&html)
         })
         .await??;
 
@@ -147,7 +148,8 @@ impl Client {
             return Err(ShiftError::InvalidRedirect(url.into()));
         }
 
-        let page = res_to_doc_transform(res, |doc| Ok(CodeRedemptionPage::from_doc(&doc)?)).await?;
+        let page =
+            res_to_html_transform(res, |html| Ok(CodeRedemptionPage::from_html(&html)?)).await?;
 
         let res = loop {
             let res = self
@@ -184,9 +186,9 @@ struct ClientData {
 }
 
 /// Convert a response to html, then feed it to the given transform function
-async fn res_to_doc_transform<F, T>(res: reqwest::Response, f: F) -> ShiftResult<T>
+async fn res_to_html_transform<F, T>(res: reqwest::Response, f: F) -> ShiftResult<T>
 where
-    F: Fn(Document) -> ShiftResult<T> + Send + 'static,
+    F: Fn(Html) -> ShiftResult<T> + Send + 'static,
     T: Send + 'static,
 {
     let status = res.status();
@@ -195,6 +197,6 @@ where
     }
 
     let text = res.text().await?;
-    let ret = tokio::task::spawn_blocking(move || f(Document::from(text.as_str()))).await??;
+    let ret = tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??;
     Ok(ret)
 }
