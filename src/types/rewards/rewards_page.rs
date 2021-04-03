@@ -7,17 +7,23 @@ use select::{
     },
 };
 
-#[derive(Debug)]
+/// Error that may occur while parsing a [`RewardsPage`].
+#[derive(Debug, thiserror::Error)]
 pub enum FromDocError {
+    /// MissingCsrfToken
+    #[error("missing csrf token")]
     MissingCsrfToken,
 }
 
+/// The rewards page
 #[derive(Debug)]
 pub struct RewardsPage {
+    /// The csrf token
     pub csrf_token: String,
 }
 
 impl RewardsPage {
+    /// Parse a [`RewardsPage`] from html
     pub(crate) fn from_doc(doc: &Document) -> Result<Self, FromDocError> {
         let csrf_token = doc
             .find(And(Name("meta"), Attr("name", "csrf-token")))

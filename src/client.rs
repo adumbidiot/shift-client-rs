@@ -43,7 +43,7 @@ impl Client {
             client: reqwest::Client::builder()
                 .cookie_store(true)
                 .build()
-                .unwrap(),
+                .expect("failed to build reqwest client"),
 
             client_data: Arc::new(RwLock::new(ClientData { email, password })),
         }

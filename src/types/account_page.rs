@@ -7,23 +7,38 @@ use select::{
     },
 };
 
-#[derive(Debug)]
+/// Error that may occur while parsing an [`AccountPage`].
+#[derive(Debug, thiserror::Error)]
 pub enum FromDocError {
+    /// Missing csrf token
+    #[error("missing csrf token")]
     MissingCsrfToken,
+    /// Missing email
+    #[error("missing email")]
     MissingEmail,
+    /// Missing display name
+    #[error("missing display name")]
     MissingDisplayName,
+    /// Missing first name
+    #[error("missing first name")]
     MissingFirstName,
 }
 
+/// The account page
 #[derive(Debug)]
 pub struct AccountPage {
+    /// The csrf token
     pub csrf_token: String,
+    /// The email
     pub email: String,
+    /// The display name
     pub display_name: String,
+    /// The first name
     pub first_name: String,
 }
 
 impl AccountPage {
+    /// Parse an [`AccountPage`] from html
     pub(crate) fn from_doc(doc: &Document) -> Result<Self, FromDocError> {
         let csrf_token = extract_csrf_token(doc)
             .ok_or(FromDocError::MissingCsrfToken)?

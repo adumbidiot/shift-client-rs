@@ -5,16 +5,32 @@ use select::{
     predicate::Name,
 };
 
+/// Error that may occur while parsing a [`RewardForm`].
 pub type FromDocError = FromNodeError;
 
-#[derive(Debug)]
+/// Error that may occur while parsing a [`RewardForm`].
+#[derive(Debug, thiserror::Error)]
 pub enum FromNodeError {
+    /// ?
+    #[error("missing utf8")]
     MissingUtf8,
+    /// Missing auth token
+    #[error("missing auth token")]
     MissingAuthToken,
+    /// Missing code
+    #[error("missing code")]
     MissingCode,
+    /// Missing check
+    #[error("missing check")]
     MissingCheck,
+    /// Missing service
+    #[error("missing service")]
     MissingService,
+    /// Missing title
+    #[error("missing title")]
     MissingTitle,
+    /// Missing commit
+    #[error("missing commit")]
     MissingCommit,
 }
 

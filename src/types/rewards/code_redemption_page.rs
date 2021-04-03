@@ -4,15 +4,25 @@ use select::{
     predicate::Attr,
 };
 
-#[derive(Debug)]
+/// Error that may occur while parsing a [`CodeRedemptionPage`]
+#[derive(Debug, thiserror::Error)]
 pub enum FromDocError {
+    /// Missing csrf token
+    #[error("missing csrf token")]
     MissingCsrfToken,
+
+    /// Missing CheckRedemptionStatusUrl
+    #[error("missing check redemption status")]
     MissingCheckRedemptionStatusUrl,
 }
 
+/// A code redemption page
 #[derive(Debug)]
 pub struct CodeRedemptionPage {
+    /// The csrf token
     pub csrf_token: String,
+
+    /// The check_redemption_status_url
     pub check_redemption_status_url: String,
 }
 

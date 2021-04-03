@@ -1,8 +1,11 @@
 use crate::util::extract_csrf_token;
 use select::document::Document;
 
-#[derive(Debug)]
+/// Error that may occur while parsing a [`HomePage`].
+#[derive(Debug, thiserror::Error)]
 pub enum FromDocError {
+    /// Missing csrf token
+    #[error("missing csrf token")]
     MissingCsrfToken,
 }
 
