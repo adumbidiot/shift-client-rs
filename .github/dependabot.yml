@@ -5,19 +5,3 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: serde
-    versions:
-    - 1.0.124
-  - dependency-name: serde_json
-    versions:
-    - 1.0.63
-    - 1.0.64
-  - dependency-name: thiserror
-    versions:
-    - 1.0.24
-  - dependency-name: tokio
-    versions:
-    - 1.1.0
-    - 1.1.1
-    - 1.2.0
