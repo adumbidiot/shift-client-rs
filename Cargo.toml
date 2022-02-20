@@ -26,10 +26,14 @@ default = []
 cli = [ 
     "shift-orcz", 
     "tokio/macros",
-    "tokio/rt-multi-thread"
+    "tokio/rt-multi-thread",
 ]
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
 
 [workspace]
 members = [ 
-    "lib/shift-orcz" 
+    "lib/shift-orcz",
 ]
