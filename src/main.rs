@@ -174,6 +174,7 @@ async fn redeem_form(client: &Client, form: &RewardForm) -> anyhow::Result<()> {
         .redeem(&form)
         .await
         .context("Failed to redeem code")?;
+    println!("Redeemed code!");
 
     if let Some(redeem_response) = redeem_response {
         if let Some(text) = redeem_response.text {
