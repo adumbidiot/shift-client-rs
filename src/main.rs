@@ -1,7 +1,11 @@
-use anyhow::Context;
+use anyhow::{
+    ensure,
+    Context,
+};
 use shift_client::{
     types::RewardsPage,
     Client,
+    RewardForm,
 };
 use shift_orcz::Game;
 use std::io::{
@@ -45,7 +49,10 @@ async fn manual_loop(client: &Client) {
             break;
         }
 
-        try_redeem_code(client, &rewards_page, code.trim()).await;
+        if let Err(e) = redeem_code(client, &rewards_page, code.trim()).await {
+            eprintln!("{:?}", e);
+            eprintln!();
+        }
     }
 }
 
@@ -103,41 +110,56 @@ async fn auto_loop(client: &Client) {
             println!();
             if choice {
                 println!("Redeeming code...");
-                try_redeem_code(client, &rewards_page, code.as_str().trim()).await;
+                match redeem_code(client, &rewards_page, code.as_str().trim()).await {
+                    Ok(()) => {}
+                    Err(e) => {
+                        eprintln!("{:?}", e);
+                        eprintln!();
+                    }
+                }
             }
             println!();
         }
     }
 }
 
-async fn try_redeem_code(client: &Client, rewards_page: &RewardsPage, code: &str) {
-    match client.get_reward_forms(rewards_page, code.trim()).await.context("Failed to get code") {
-        Ok(forms) => {
-            if forms.is_empty() {
-                eprintln!("Error: No forms retrieved for code");
-            }
+async fn redeem_code(
+    client: &Client,
+    rewards_page: &RewardsPage,
+    code: &str,
+) -> anyhow::Result<()> {
+    let forms = client
+        .get_reward_forms(rewards_page, code.trim())
+        .await
+        .context("Failed to get code")?;
 
-            for form in forms {
-                match client.redeem(&form).await.context("Failed to redeem code") {
-                    Ok(redeem_response) => {
-                        if let Some(text) = redeem_response.text {
-                            println!("Response: {}", text);
-                        } else {
-                            eprintln!("Unknown Redeem Response: {:#?}", redeem_response);
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("{:?}", e);
-                        eprintln!();
-                    }
-                };
+    ensure!(!forms.is_empty(), "No forms retrieved for code");
+
+    for form in forms {
+        match redeem_form(client, &form).await {
+            Ok(()) => {}
+            Err(e) => {
+                eprintln!("{:?}", e);
+                eprintln!();
             }
         }
-        Err(e) => {
-            eprintln!("{:?}", e);
-            eprintln!();
-        }
-    };
+    }
+
+    Ok(())
+}
+
+async fn redeem_form(client: &Client, form: &RewardForm) -> anyhow::Result<()> {
+    let redeem_response = client
+        .redeem(&form)
+        .await
+        .context("Failed to redeem code")?;
+    if let Some(text) = redeem_response.text {
+        println!("Response: {}", text);
+    } else {
+        eprintln!("Unknown Redeem Response: {:#?}", redeem_response);
+    }
+
+    Ok(())
 }
 
 fn main() {
