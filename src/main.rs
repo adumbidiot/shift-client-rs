@@ -99,7 +99,9 @@ async fn auto_loop(client: &Client) {
             println!();
 
             println!("Would you like to redeem this code? (Y/N)");
-            if input_yn() {
+            let choice = input_yn();
+            println!();
+            if choice {
                 println!("Redeeming code...");
                 try_redeem_code(client, &rewards_page, code.as_str().trim()).await;
             }
@@ -109,14 +111,14 @@ async fn auto_loop(client: &Client) {
 }
 
 async fn try_redeem_code(client: &Client, rewards_page: &RewardsPage, code: &str) {
-    match client.get_reward_forms(rewards_page, code.trim()).await {
+    match client.get_reward_forms(rewards_page, code.trim()).await.context("Failed to get code") {
         Ok(forms) => {
             if forms.is_empty() {
                 eprintln!("Error: No forms retrieved for code");
             }
 
             for form in forms {
-                match client.redeem(&form).await {
+                match client.redeem(&form).await.context("Failed to redeem code") {
                     Ok(redeem_response) => {
                         if let Some(text) = redeem_response.text {
                             println!("Response: {}", text);
@@ -125,14 +127,14 @@ async fn try_redeem_code(client: &Client, rewards_page: &RewardsPage, code: &str
                         }
                     }
                     Err(e) => {
-                        eprintln!("Failed to redeem code: {:#?}", e);
+                        eprintln!("{:?}", e);
                         eprintln!();
                     }
                 };
             }
         }
         Err(e) => {
-            eprintln!("Failed to get code: {:#?}", e);
+            eprintln!("{:?}", e);
             eprintln!();
         }
     };
@@ -190,7 +192,7 @@ async fn login_client() -> Client {
         let client = Client::new(email.trim().into(), password.trim().into());
 
         // try to log in
-        match client.login().await.context("login failed") {
+        match client.login().await.context("Login failed") {
             Ok(page) => {
                 println!("Logged in!");
                 println!();
@@ -203,8 +205,7 @@ async fn login_client() -> Client {
                 break client;
             }
             Err(e) => {
-                eprintln!("Login failed!");
-                eprintln!("Error: {:?}", e);
+                eprintln!("{:?}", e);
                 eprintln!();
             }
         }
