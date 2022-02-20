@@ -63,9 +63,9 @@ pub enum ExtractShiftCodesError {
     #[error("missing table body")]
     MissingTableBody,
 
-    /// Date parse error
-    #[error(transparent)]
-    DateParse(#[from] time::error::Parse),
+    /// Invalid lookup date
+    #[error("invalid lookup date `{0}`")]
+    InvalidLookupDate(String, #[source] time::error::Parse),
 
     /// Invalid shift code
     #[error("invalid shift code")]
@@ -78,6 +78,9 @@ pub enum ExtractShiftCodesError {
 
 /// Extract shift codes from html
 fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, ExtractShiftCodesError> {
+    const SAME_CODE_AS_FORMAT: &[time::format_description::FormatItem<'static>] =
+        time::macros::format_description!("[ month padding:none ]/[ day ]/[ year ]");
+
     let table_selector = Selector::parse("table").expect("invalid table selector");
     let table = html
         .select(&table_selector)
@@ -89,9 +92,6 @@ fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, Extrac
         .select(&table_body_selector)
         .next()
         .ok_or(ExtractShiftCodesError::MissingTableBody)?;
-
-    let same_code_as_format = time::format_description::parse("Same code as [month]/[day]/[year]")
-        .expect("invalid same_code_as_format");
 
     let row_selector = Selector::parse("tr").expect("invalid row selector");
     let mut ret = if game.is_bl3() {
@@ -114,8 +114,10 @@ fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, Extrac
             // Fix "Same as {date}" entries...
             {
                 let code_str = ret[i].get_code_array()[code_index].as_str();
-                if code_str.starts_with("Same code as ") {
-                    let lookup_date = Date::parse(code_str, &same_code_as_format)?;
+                if let Some(code_str) = code_str.strip_prefix("Same code as ") {
+                    let lookup_date = Date::parse(code_str, SAME_CODE_AS_FORMAT).map_err(|e| {
+                        ExtractShiftCodesError::InvalidLookupDate(code_str.to_string(), e)
+                    })?;
 
                     let mut resolved_code = ret
                         .iter()
