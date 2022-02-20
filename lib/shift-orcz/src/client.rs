@@ -33,22 +33,23 @@ impl Client {
         F: Fn(Html) -> OrczResult<T> + Send + 'static,
         T: Send + 'static,
     {
-        let res = self.client.get(url).send().await?;
-        let status = res.status();
-        if !status.is_success() {
-            return Err(OrczError::InvalidStatus(status));
-        }
-        let text = res.text().await?;
+        let text = self
+            .client
+            .get(url)
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
         Ok(tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??)
     }
 
     /// Get the shift codes for a given game
     pub async fn get_shift_codes(&self, game: Game) -> OrczResult<Vec<ShiftCode>> {
-        Ok(self
-            .get_html(game.page_url(), move |html| {
-                extract_shift_codes(&html, game).ok_or(OrczError::TableParse)
-            })
-            .await?)
+        self.get_html(game.page_url(), move |html| {
+            extract_shift_codes(&html, game).ok_or(OrczError::TableParse)
+        })
+        .await
     }
 }
 
