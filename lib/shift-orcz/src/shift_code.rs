@@ -2,6 +2,7 @@ mod issue_date;
 
 use self::issue_date::parse_issue_date;
 use crate::code::Code;
+use once_cell::sync::Lazy;
 use scraper::{
     ElementRef,
     Selector,
@@ -11,6 +12,9 @@ use time::Date;
 pub const PC_CODE_INDEX: usize = 0;
 pub const PLAYSTATION_CODE_INDEX: usize = 1;
 pub const XBOX_CODE_INDEX: usize = 2;
+
+static TD_SELECTOR: Lazy<Selector> =
+    Lazy::new(|| Selector::parse("td").expect("invalid TD_SELECTOR"));
 
 /// Error that may occur while parsing a ShiftCode from an element
 #[derive(Debug, thiserror::Error)]
@@ -77,9 +81,9 @@ pub struct ShiftCode {
 }
 
 impl ShiftCode {
+    /// Parse a [`ShiftCode`] from a non-bl3 element.
     pub(crate) fn from_element(row: ElementRef) -> Result<Self, FromElementError> {
-        let td_selector = Selector::parse("td").expect("invalid td selector");
-        let mut iter = row.select(&td_selector);
+        let mut iter = row.select(&TD_SELECTOR);
 
         let source = iter
             .next()
@@ -119,8 +123,7 @@ impl ShiftCode {
 
     /// Parse a [`ShiftCode`] from a bl3 element.
     pub(crate) fn from_element_bl3(row: ElementRef) -> Result<Self, FromElementError> {
-        let td_selector = Selector::parse("td").expect("invalid td selector");
-        let mut iter = row.select(&td_selector);
+        let mut iter = row.select(&TD_SELECTOR);
 
         let source = iter
             .next()

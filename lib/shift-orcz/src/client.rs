@@ -3,6 +3,7 @@ use crate::{
     OrczResult,
     ShiftCode,
 };
+use once_cell::sync::Lazy;
 use scraper::{
     Html,
     Selector,
@@ -78,31 +79,18 @@ pub enum ExtractShiftCodesError {
 
 /// Extract shift codes from html
 fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, ExtractShiftCodesError> {
+    static TABLE_BODY_ROW_SELECTOR: Lazy<Selector> =
+        Lazy::new(|| Selector::parse("table tbody tr").expect("invalid TABLE_BODY_ROW_SELECTOR"));
     const SAME_CODE_AS_FORMAT: &[time::format_description::FormatItem<'static>] =
         time::macros::format_description!("[ month padding:none ]/[ day ]/[ year ]");
 
-    let table_selector = Selector::parse("table").expect("invalid table selector");
-    let table = html
-        .select(&table_selector)
-        .next()
-        .ok_or(ExtractShiftCodesError::MissingTable)?;
-
-    let table_body_selector = Selector::parse("tbody").expect("invalid table body selector");
-    let table_body = table
-        .select(&table_body_selector)
-        .next()
-        .ok_or(ExtractShiftCodesError::MissingTableBody)?;
-
-    let row_selector = Selector::parse("tr").expect("invalid row selector");
     let mut ret = if game.is_bl3() {
-        table_body
-            .select(&row_selector)
+        html.select(&TABLE_BODY_ROW_SELECTOR)
             .skip(1) // Skip title
             .map(ShiftCode::from_element_bl3)
             .collect::<Result<Vec<_>, _>>()?
     } else {
-        table_body
-            .select(&row_selector)
+        html.select(&TABLE_BODY_ROW_SELECTOR)
             .skip(1) // Skip title
             .map(ShiftCode::from_element)
             .collect::<Result<Vec<_>, _>>()?

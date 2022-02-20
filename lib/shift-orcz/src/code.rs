@@ -1,7 +1,11 @@
+use once_cell::sync::Lazy;
 use scraper::{
     ElementRef,
     Selector,
 };
+
+static SPAN_SELECTOR: Lazy<Selector> =
+    Lazy::new(|| Selector::parse("span[style=\"color:red\"]").expect("invalid span selector"));
 
 /// Error that may occur while parsing a Code from an element
 #[derive(Debug, thiserror::Error)]
@@ -56,9 +60,7 @@ impl Code {
 
     /// Parse this code from an element
     pub(crate) fn from_element(element: ElementRef) -> Result<Self, FromElementError> {
-        let span_selector =
-            Selector::parse("span[style=\"color:red\"]").expect("invalid span selector");
-        let maybe_span = element.select(&span_selector).next();
+        let maybe_span = element.select(&SPAN_SELECTOR).next();
 
         match maybe_span {
             Some(el) => {

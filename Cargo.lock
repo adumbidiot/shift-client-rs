@@ -1174,6 +1174,7 @@ name = "shift-orcz"
 version = "0.0.0"
 dependencies = [
  "logos",
+ "once_cell",
  "reqwest",
  "scraper",
  "thiserror",
