@@ -41,7 +41,7 @@ impl Client {
             .error_for_status()?
             .text()
             .await?;
-        Ok(tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??)
+        tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await?
     }
 
     /// Get the shift codes for a given game
