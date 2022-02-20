@@ -39,6 +39,10 @@ pub enum ShiftError {
     #[error("invalid account page")]
     InvalidAccountPage(#[from] InvalidAccountPage),
 
+    /// Missing alert notice
+    #[error("missing alert notice")]
+    MissingAlertNotice,
+
     /// NonExistentShiftCode
     #[error("non-existent shift code")]
     NonExistentShiftCode,

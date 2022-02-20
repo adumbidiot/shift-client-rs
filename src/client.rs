@@ -5,6 +5,7 @@ use crate::{
     },
     types::{
         rewards::{
+            AlertNotice,
             CodeRedemptionJson,
             CodeRedemptionPage,
             RewardForm,
@@ -140,6 +141,17 @@ impl Client {
             .await?;
 
         let url = res.url().as_str();
+        if url.starts_with(REWARDS_URL) {
+            let page =
+                res_to_html_transform(res, |html| Ok(RewardsPage::from_html(&html)?)).await?;
+            let alert_notice = page.alert_notice.ok_or(ShiftError::MissingAlertNotice)?;
+            match alert_notice {
+                AlertNotice::ShiftCodeAlreadyRedeemed => {
+                    return Err(ShiftError::UnavailableShiftCode);
+                }
+            }
+        }
+
         if !url.starts_with(CODE_REDEMPTIONS_URL) {
             return Err(ShiftError::InvalidRedirect(url.into()));
         }

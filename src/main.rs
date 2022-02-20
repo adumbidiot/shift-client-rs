@@ -74,7 +74,10 @@ async fn auto_loop(client: &Client) {
 
     let game = loop {
         println!("What game do you want to target? (bl, bl2, blps, bl3)");
-        match input().to_lowercase().as_str() {
+        let choice = input().to_lowercase();
+        println!();
+
+        match choice.as_str() {
             "bl" => break Game::Borderlands,
             "bl2" => break Game::Borderlands2,
             "blps" => break Game::BorderlandsPreSequel,

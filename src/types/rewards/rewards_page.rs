@@ -1,5 +1,13 @@
 use crate::util::extract_csrf_token;
-use scraper::Html;
+use once_cell::sync::Lazy;
+use scraper::{
+    ElementRef,
+    Html,
+    Selector,
+};
+
+static ALERT_NOTICE_SELECTOR: Lazy<Selector> =
+    Lazy::new(|| Selector::parse(".alert.notice p").expect("invalid ALERT_NOTICE_SELECTOR"));
 
 /// Error that may occur while parsing a [`RewardsPage`].
 #[derive(Debug, thiserror::Error)]
@@ -7,6 +15,10 @@ pub enum FromHtmlError {
     /// MissingCsrfToken
     #[error("missing csrf token")]
     MissingCsrfToken,
+
+    /// Invalid alert notice
+    #[error("invalid alert notice")]
+    InvalidAlertNotice(#[from] FromElementError),
 }
 
 /// The rewards page
@@ -14,6 +26,9 @@ pub enum FromHtmlError {
 pub struct RewardsPage {
     /// The csrf token
     pub csrf_token: String,
+
+    /// An alert notice
+    pub alert_notice: Option<AlertNotice>,
 }
 
 impl RewardsPage {
@@ -23,7 +38,45 @@ impl RewardsPage {
             .ok_or(FromHtmlError::MissingCsrfToken)?
             .to_string();
 
-        Ok(Self { csrf_token })
+        let alert_notice = html
+            .select(&ALERT_NOTICE_SELECTOR)
+            .next()
+            .map(AlertNotice::from_element)
+            .transpose()?;
+
+        Ok(Self {
+            csrf_token,
+            alert_notice,
+        })
+    }
+}
+
+/// An error that may occur while parsing an AlertNotice
+#[derive(Debug, thiserror::Error)]
+pub enum FromElementError {
+    /// Missing text
+    #[error("missing text")]
+    MissingText,
+
+    #[error("unknown text '{0}'")]
+    UnknownText(String),
+}
+
+#[derive(Debug)]
+pub enum AlertNotice {
+    /// A shift code was already redeemed
+    ShiftCodeAlreadyRedeemed,
+}
+
+impl AlertNotice {
+    /// Parse an alert notice from an element
+    fn from_element(el: ElementRef) -> Result<Self, FromElementError> {
+        let text = el.text().next().ok_or(FromElementError::MissingText)?;
+
+        match text {
+            "This SHiFT code has already been redeemed" => Ok(Self::ShiftCodeAlreadyRedeemed),
+            _ => Err(FromElementError::UnknownText(text.to_string())),
+        }
     }
 }
 
