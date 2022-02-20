@@ -1,7 +1,19 @@
+use once_cell::sync::Lazy;
 use scraper::{
     ElementRef,
     Selector,
 };
+
+static SPAN_SELECTOR: Lazy<Selector> =
+    Lazy::new(|| Selector::parse("span[style=\"color:red\"]").expect("invalid span selector"));
+
+/// Error that may occur while parsing a Code from an element
+#[derive(Debug, thiserror::Error)]
+pub enum FromElementError {
+    /// Missing code
+    #[error("missing code")]
+    MissingCode,
+}
 
 /// A Shift Code
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -47,19 +59,25 @@ impl Code {
     }
 
     /// Parse this code from an element
-    pub(crate) fn from_element(element: ElementRef) -> Option<Self> {
-        let span_selector =
-            Selector::parse("span[style=\"color:red\"]").expect("invalid span selector");
-        let maybe_span = element.select(&span_selector).next();
+    pub(crate) fn from_element(element: ElementRef) -> Result<Self, FromElementError> {
+        let maybe_span = element.select(&SPAN_SELECTOR).next();
 
         match maybe_span {
             Some(el) => {
-                let code = el.text().next()?.trim();
-                Some(Self::Expired(code.into()))
+                let code = el
+                    .text()
+                    .next()
+                    .ok_or(FromElementError::MissingCode)?
+                    .trim();
+                Ok(Self::Expired(code.into()))
             }
             None => {
-                let code = element.text().next()?.trim();
-                Some(Self::Valid(code.into()))
+                let code = element
+                    .text()
+                    .next()
+                    .ok_or(FromElementError::MissingCode)?
+                    .trim();
+                Ok(Self::Valid(code.into()))
             }
         }
     }

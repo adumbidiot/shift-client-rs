@@ -1,14 +1,14 @@
 use crate::{
     Game,
-    OrczError,
     OrczResult,
     ShiftCode,
 };
-use chrono::NaiveDate;
+use once_cell::sync::Lazy;
 use scraper::{
     Html,
     Selector,
 };
+use time::Date;
 
 /// Client
 #[derive(Default, Clone)]
@@ -33,45 +33,67 @@ impl Client {
         F: Fn(Html) -> OrczResult<T> + Send + 'static,
         T: Send + 'static,
     {
-        let res = self.client.get(url).send().await?;
-        let status = res.status();
-        if !status.is_success() {
-            return Err(OrczError::InvalidStatus(status));
-        }
-        let text = res.text().await?;
-        Ok(tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??)
+        let text = self
+            .client
+            .get(url)
+            .send()
+            .await?
+            .error_for_status()?
+            .text()
+            .await?;
+        tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await?
     }
 
     /// Get the shift codes for a given game
     pub async fn get_shift_codes(&self, game: Game) -> OrczResult<Vec<ShiftCode>> {
-        Ok(self
-            .get_html(game.page_url(), move |html| {
-                extract_shift_codes(&html, game).ok_or(OrczError::TableParse)
-            })
-            .await?)
+        self.get_html(game.page_url(), move |html| {
+            Ok(extract_shift_codes(&html, game)?)
+        })
+        .await
     }
 }
 
-fn extract_shift_codes(html: &Html, game: Game) -> Option<Vec<ShiftCode>> {
-    let table_selector = Selector::parse("table").expect("invalid table selector");
-    let table = html.select(&table_selector).next()?;
+/// Error that may occur while extracting shift codes from html
+#[derive(Debug, thiserror::Error)]
+pub enum ExtractShiftCodesError {
+    /// Missing table
+    #[error("missing table")]
+    MissingTable,
 
-    let table_body_selector = Selector::parse("tbody").expect("invalid table body selector");
-    let table_body = table.select(&table_body_selector).next()?;
+    /// Missing table body
+    #[error("missing table body")]
+    MissingTableBody,
 
-    let row_selector = Selector::parse("tr").expect("invalid row selector");
+    /// Invalid lookup date
+    #[error("invalid lookup date `{0}`")]
+    InvalidLookupDate(String, #[source] time::error::Parse),
+
+    /// Invalid shift code
+    #[error("invalid shift code")]
+    InvalidShiftCode(#[from] crate::shift_code::FromElementError),
+
+    /// Unknown error occured
+    #[error("unknown error")]
+    Unknown,
+}
+
+/// Extract shift codes from html
+fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, ExtractShiftCodesError> {
+    static TABLE_BODY_ROW_SELECTOR: Lazy<Selector> =
+        Lazy::new(|| Selector::parse("table tbody tr").expect("invalid TABLE_BODY_ROW_SELECTOR"));
+    const SAME_CODE_AS_FORMAT: &[time::format_description::FormatItem<'static>] =
+        time::macros::format_description!("[ month padding:none ]/[ day ]/[ year ]");
+
     let mut ret = if game.is_bl3() {
-        table_body
-            .select(&row_selector)
+        html.select(&TABLE_BODY_ROW_SELECTOR)
             .skip(1) // Skip title
             .map(ShiftCode::from_element_bl3)
-            .collect::<Option<Vec<_>>>()?
+            .collect::<Result<Vec<_>, _>>()?
     } else {
-        table_body
-            .select(&row_selector)
+        html.select(&TABLE_BODY_ROW_SELECTOR)
             .skip(1) // Skip title
             .map(ShiftCode::from_element)
-            .collect::<Option<Vec<_>>>()?
+            .collect::<Result<Vec<_>, _>>()?
     };
 
     // I hate this
@@ -80,19 +102,25 @@ fn extract_shift_codes(html: &Html, game: Game) -> Option<Vec<ShiftCode>> {
             // Fix "Same as {date}" entries...
             {
                 let code_str = ret[i].get_code_array()[code_index].as_str();
-                if code_str.starts_with("Same code as ") {
-                    let lookup_date =
-                        NaiveDate::parse_from_str(code_str, "Same code as %m/%d/%Y").ok()?;
+                if let Some(code_str) = code_str.strip_prefix("Same code as ") {
+                    let lookup_date = Date::parse(code_str, SAME_CODE_AS_FORMAT).map_err(|e| {
+                        ExtractShiftCodesError::InvalidLookupDate(code_str.to_string(), e)
+                    })?;
 
                     let mut resolved_code = ret
                         .iter()
-                        .find(|el| el.issue_date == lookup_date)?
-                        .get_code(code_index)?
+                        .find(|el| el.issue_date == lookup_date)
+                        .ok_or(ExtractShiftCodesError::Unknown)?
+                        .get_code(code_index)
+                        .ok_or(ExtractShiftCodesError::Unknown)?
                         .as_str()
                         .to_string();
 
                     std::mem::swap(
-                        ret[i].get_code_mut(code_index)?.as_mut_string(),
+                        ret[i]
+                            .get_code_mut(code_index)
+                            .ok_or(ExtractShiftCodesError::Unknown)?
+                            .as_mut_string(),
                         &mut resolved_code,
                     );
                 }
@@ -102,10 +130,17 @@ fn extract_shift_codes(html: &Html, game: Game) -> Option<Vec<ShiftCode>> {
             {
                 let code_str = ret[i].get_code_array()[code_index].as_str();
                 if code_str.starts_with("See Key Above") {
-                    let mut resolved_code = ret[i - 1].get_code(code_index)?.as_str().to_string();
+                    let mut resolved_code = ret[i - 1]
+                        .get_code(code_index)
+                        .ok_or(ExtractShiftCodesError::Unknown)?
+                        .as_str()
+                        .to_string();
 
                     std::mem::swap(
-                        ret[i].get_code_mut(code_index)?.as_mut_string(),
+                        ret[i]
+                            .get_code_mut(code_index)
+                            .ok_or(ExtractShiftCodesError::Unknown)?
+                            .as_mut_string(),
                         &mut resolved_code,
                     );
                 }
@@ -113,7 +148,7 @@ fn extract_shift_codes(html: &Html, game: Game) -> Option<Vec<ShiftCode>> {
         }
     }
 
-    Some(ret)
+    Ok(ret)
 }
 
 #[cfg(test)]

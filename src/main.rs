@@ -108,7 +108,7 @@ async fn auto_loop(client: &Client) {
 }
 
 async fn try_redeem_code(client: &Client, rewards_page: &RewardsPage, code: &str) {
-    match client.get_reward_forms(&rewards_page, code.trim()).await {
+    match client.get_reward_forms(rewards_page, code.trim()).await {
         Ok(forms) => {
             if forms.is_empty() {
                 eprintln!("Error: No forms retrieved for code");
