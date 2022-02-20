@@ -155,6 +155,9 @@ impl Client {
                 AlertNotice::ShiftCodeRedeemed => {
                     return Ok(None);
                 }
+                AlertNotice::ShiftCodeRedeemFail => {
+                    return Err(ShiftError::ShiftCodeRedeemFail);
+                }
             }
         }
 

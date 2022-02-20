@@ -72,6 +72,9 @@ pub enum AlertNotice {
 
     /// Redeemed a shift code
     ShiftCodeRedeemed,
+
+    /// Redeem failed
+    ShiftCodeRedeemFail,
 }
 
 impl AlertNotice {
@@ -85,6 +88,7 @@ impl AlertNotice {
                 Ok(Self::LaunchShiftGame)
             }
             "Your code was successfully redeemed" => Ok(Self::ShiftCodeRedeemed),
+            "Failed to redeem your SHiFT code" => Ok(Self::ShiftCodeRedeemFail),
             _ => Err(FromElementError::UnknownText(text.to_string())),
         }
     }

@@ -59,6 +59,9 @@ pub enum ShiftError {
     /// Launch shift game
     #[error("launch a shift game to redeem the code")]
     LaunchShiftGame,
+    /// ShiftCode Redeem Fail
+    #[error("failed to redeem shift code")]
+    ShiftCodeRedeemFail,
 
     /// Failed to join tokio task
     #[error("tokio task join error")]
