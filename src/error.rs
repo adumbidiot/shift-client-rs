@@ -14,7 +14,7 @@ pub type InvalidAccountPage = crate::types::account_page::FromHtmlError;
 #[derive(Debug, thiserror::Error)]
 pub enum ShiftError {
     /// Reqwest HTTP error
-    #[error("{0}")]
+    #[error("reqwest http error")]
     Reqwest(#[from] reqwest::Error),
     /// invalid http status
     #[error("invalid http status '{0}'")]
@@ -24,23 +24,23 @@ pub enum ShiftError {
     InvalidRedirect(String),
 
     /// Json Error
-    #[error("{0}")]
+    #[error("json parse error")]
     Json(#[from] serde_json::Error),
 
     /// Invalid Rewards page
-    #[error("{0}")]
+    #[error("invalid rewards page")]
     InvalidRewardsPage(#[from] RewardsPageError),
     /// Invalid Home page
-    #[error("{0}")]
+    #[error("invalid home page")]
     InvalidHomePage(#[from] InvalidHomePageError),
     /// Invalid RewardForm
-    #[error("{0}")]
+    #[error("invalid reward form")]
     InvalidRewardForm(#[from] RewardFormError),
     /// Invalid code redemption page
-    #[error("{0}")]
+    #[error("invalid code redemption page")]
     InvalidCodeRedemptionPage(#[from] InvalidCodeRedemptionPageError),
     /// Invalid Account page
-    #[error("{0}")]
+    #[error("invalid account page")]
     InvalidAccountPage(#[from] InvalidAccountPage),
 
     /// NonExistentShiftCode
@@ -54,6 +54,6 @@ pub enum ShiftError {
     UnavailableShiftCode,
 
     /// Failed to join tokio task
-    #[error("{0}")]
+    #[error("tokio task join error")]
     TokioJoin(#[from] tokio::task::JoinError),
 }
