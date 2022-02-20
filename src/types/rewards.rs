@@ -7,5 +7,8 @@ pub use self::{
     code_redemption_json::CodeRedemptionJson,
     code_redemption_page::CodeRedemptionPage,
     reward_form::RewardForm,
-    rewards_page::RewardsPage,
+    rewards_page::{
+        AlertNotice,
+        RewardsPage,
+    },
 };
