@@ -1,3 +1,4 @@
+use anyhow::Context;
 use shift_client::{
     types::RewardsPage,
     Client,
@@ -137,18 +138,59 @@ async fn try_redeem_code(client: &Client, rewards_page: &RewardsPage, code: &str
     };
 }
 
-#[tokio::main]
-async fn main() {
-    let client = loop {
+fn main() {
+    let code = match real_main() {
+        Ok(()) => 0,
+        Err(e) => {
+            eprintln!("{:?}", e);
+            1
+        }
+    };
+
+    std::process::exit(code);
+}
+
+fn real_main() -> anyhow::Result<()> {
+    let tokio_rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .context("failed to build tokio runtime")?;
+
+    tokio_rt.block_on(async_main())?;
+
+    Ok(())
+}
+
+async fn async_main() -> anyhow::Result<()> {
+    let client = login_client().await;
+
+    println!("Would you like to use manual mode? (Y/N)");
+    if input_yn() {
+        println!("Using manual mode...");
+        manual_loop(&client).await;
+    } else {
+        println!("Using auto mode...");
+        auto_loop(&client).await;
+    }
+
+    Ok(())
+}
+
+/// Login the client
+async fn login_client() -> Client {
+    loop {
+        // get credentials
         print!("Email: ");
         let email = input();
-
         print!("Password: ");
         let password = input();
+        println!();
 
+        // make client
         let client = Client::new(email.trim().into(), password.trim().into());
 
-        match client.login().await {
+        // try to log in
+        match client.login().await.context("login failed") {
             Ok(page) => {
                 println!("Logged in!");
                 println!();
@@ -161,18 +203,10 @@ async fn main() {
                 break client;
             }
             Err(e) => {
-                eprintln!("Login failed! Got error: {:#?}", e);
+                eprintln!("Login failed!");
+                eprintln!("Error: {:?}", e);
                 eprintln!();
             }
         }
-    };
-
-    println!("Would you like to use manual mode? (Y/N)");
-    if input_yn() {
-        println!("Using manual mode...");
-        manual_loop(&client).await;
-    } else {
-        println!("Using auto mode...");
-        auto_loop(&client).await;
     }
 }

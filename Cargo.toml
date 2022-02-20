@@ -1,22 +1,25 @@
 [package]
 name = "shift-client"
 version = "0.0.0"
-authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
-edition = "2018"
-license = "MIT/Apache-2.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
 
 [[bin]]         
 name = "shift-client"    
 required-features = [ "cli" ]
 
 [dependencies]
+once_cell = "1.9.0"
 reqwest = { version = "0.11.9", features = [ "cookies" ] }
 scraper = { version = "0.12.0", default-features = false }
 serde = { version = "1.0.136", features = [ "derive" ] }
 serde_json = "1.0.79"
-shift-orcz = { path = "lib/shift-orcz", optional = true }
 thiserror = "1.0.30"
 tokio = { version = "1.17.0", features = [ "time" ] }
+
+# Optional
+anyhow = { version = "1.0.54", optional = true }
+shift-orcz = { path = "lib/shift-orcz", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1.17.0", features = [ "macros" ] }
@@ -24,8 +27,8 @@ tokio = { version = "1.17.0", features = [ "macros" ] }
 [features]
 default = []
 cli = [ 
+    "anyhow",
     "shift-orcz", 
-    "tokio/macros",
     "tokio/rt-multi-thread",
 ]
 
