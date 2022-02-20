@@ -3,6 +3,14 @@ use scraper::{
     Selector,
 };
 
+/// Error that may occur while parsing a Code from an element
+#[derive(Debug, thiserror::Error)]
+pub enum FromElementError {
+    /// Missing code
+    #[error("missing code")]
+    MissingCode,
+}
+
 /// A Shift Code
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Code {
@@ -47,19 +55,27 @@ impl Code {
     }
 
     /// Parse this code from an element
-    pub(crate) fn from_element(element: ElementRef) -> Option<Self> {
+    pub(crate) fn from_element(element: ElementRef) -> Result<Self, FromElementError> {
         let span_selector =
             Selector::parse("span[style=\"color:red\"]").expect("invalid span selector");
         let maybe_span = element.select(&span_selector).next();
 
         match maybe_span {
             Some(el) => {
-                let code = el.text().next()?.trim();
-                Some(Self::Expired(code.into()))
+                let code = el
+                    .text()
+                    .next()
+                    .ok_or(FromElementError::MissingCode)?
+                    .trim();
+                Ok(Self::Expired(code.into()))
             }
             None => {
-                let code = element.text().next()?.trim();
-                Some(Self::Valid(code.into()))
+                let code = element
+                    .text()
+                    .next()
+                    .ok_or(FromElementError::MissingCode)?
+                    .trim();
+                Ok(Self::Valid(code.into()))
             }
         }
     }

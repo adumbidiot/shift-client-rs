@@ -1,16 +1,56 @@
 mod issue_date;
 
+use self::issue_date::parse_issue_date;
 use crate::code::Code;
-use chrono::NaiveDate;
-use issue_date::parse_issue_date;
 use scraper::{
     ElementRef,
     Selector,
 };
+use time::Date;
 
 pub const PC_CODE_INDEX: usize = 0;
 pub const PLAYSTATION_CODE_INDEX: usize = 1;
 pub const XBOX_CODE_INDEX: usize = 2;
+
+/// Error that may occur while parsing a ShiftCode from an element
+#[derive(Debug, thiserror::Error)]
+pub enum FromElementError {
+    /// Missing the source
+    #[error("missing source")]
+    MissingSource,
+
+    /// Missing rewards
+    #[error("missing rewards")]
+    MissingRewards,
+
+    /// Missing Issue Date
+    #[error("missing issue date")]
+    MissingIssueDate,
+
+    /// Missing expiration
+    #[error("missing expiration")]
+    MissingExpiration,
+
+    /// Missing PC Code
+    #[error("missing pc code")]
+    MissingPcCode,
+
+    /// Missing Playstaion Code
+    #[error("missing playstation code")]
+    MissingPlaystationCode,
+
+    /// Missing PC Code
+    #[error("missing xbox code")]
+    MissingXboxCode,
+
+    /// Invalid Issue date
+    #[error("invalid issue date")]
+    InvalidIssueDate(#[from] self::issue_date::ParseIssueDateError),
+
+    /// Invalid code
+    #[error("invalid code")]
+    InvalidCode(#[from] crate::code::FromElementError),
+}
 
 /// A shift code table entry wrapper
 ///
@@ -21,7 +61,7 @@ pub struct ShiftCode {
     pub source: String,
 
     /// The issue date
-    pub issue_date: NaiveDate,
+    pub issue_date: Date,
 
     /// The rewards
     pub rewards: String,
@@ -37,24 +77,36 @@ pub struct ShiftCode {
 }
 
 impl ShiftCode {
-    pub(crate) fn from_element(row: ElementRef) -> Option<Self> {
+    pub(crate) fn from_element(row: ElementRef) -> Result<Self, FromElementError> {
         let td_selector = Selector::parse("td").expect("invalid td selector");
         let mut iter = row.select(&td_selector);
 
-        let source = iter.next()?.text().next()?.trim().to_string();
+        let source = iter
+            .next()
+            .and_then(|el| el.text().next())
+            .ok_or(FromElementError::MissingSource)?
+            .trim()
+            .to_string();
 
-        let rewards = process_rewards_node(iter.next()?);
+        let rewards = process_rewards_node(iter.next().ok_or(FromElementError::MissingRewards)?);
 
-        let issue_date_str = iter.next()?.text().next()?.trim();
-        let issue_date = parse_issue_date(issue_date_str).ok()?;
+        let issue_date_str = iter
+            .next()
+            .and_then(|el| el.text().next())
+            .ok_or(FromElementError::MissingIssueDate)?
+            .trim();
+        let issue_date = parse_issue_date(issue_date_str)?;
 
-        let _expiration = iter.next()?;
+        let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
-        let pc = Code::from_element(iter.next()?)?;
-        let playstation = Code::from_element(iter.next()?)?;
-        let xbox = Code::from_element(iter.next()?)?;
+        let pc = Code::from_element(iter.next().ok_or(FromElementError::MissingPcCode)?)?;
+        let playstation = Code::from_element(
+            iter.next()
+                .ok_or(FromElementError::MissingPlaystationCode)?,
+        )?;
+        let xbox = Code::from_element(iter.next().ok_or(FromElementError::MissingXboxCode)?)?;
 
-        Some(ShiftCode {
+        Ok(ShiftCode {
             source,
             issue_date,
             rewards,
@@ -66,26 +118,37 @@ impl ShiftCode {
     }
 
     /// Parse a [`ShiftCode`] from a bl3 element.
-    pub(crate) fn from_element_bl3(row: ElementRef) -> Option<Self> {
+    pub(crate) fn from_element_bl3(row: ElementRef) -> Result<Self, FromElementError> {
         let td_selector = Selector::parse("td").expect("invalid td selector");
         let mut iter = row.select(&td_selector);
 
-        let source = iter.next()?.text().next()?.trim().to_string();
+        let source = iter
+            .next()
+            .and_then(|el| el.text().next())
+            .ok_or(FromElementError::MissingSource)?
+            .trim()
+            .to_string();
 
-        let rewards = process_rewards_node(iter.next()?);
+        let rewards = process_rewards_node(iter.next().ok_or(FromElementError::MissingRewards)?);
 
-        let issue_date_str = iter.next()?.text().next()?.trim();
-        let issue_date = parse_issue_date(issue_date_str).ok()?;
+        let issue_date_str = iter
+            .next()
+            .and_then(|el| el.text().next())
+            .ok_or(FromElementError::MissingIssueDate)?
+            .trim()
+            .replace("??", "1"); // TODO: Consider making day optional
+        let issue_date = parse_issue_date(&issue_date_str)?;
 
-        let _expiration = iter.next()?;
+        let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
-        let code = Code::from_element(iter.next()?)?;
+        // Kinda hacky, maybe introduce a new error type
+        let code = Code::from_element(iter.next().ok_or(FromElementError::MissingPcCode)?)?;
 
         let pc = code.clone();
         let playstation = code.clone();
         let xbox = code;
 
-        Some(ShiftCode {
+        Ok(ShiftCode {
             source,
             issue_date,
             rewards,

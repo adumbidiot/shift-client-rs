@@ -24,7 +24,7 @@ pub enum OrczError {
     ///
     /// This is usually a library error; update this lib.
     #[error("invalid table")]
-    TableParse,
+    TableParse(#[from] self::client::ExtractShiftCodesError),
 
     /// a tokio task failed
     #[error("tokio task join failed")]
