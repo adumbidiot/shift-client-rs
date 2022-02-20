@@ -53,6 +53,13 @@ pub enum ShiftError {
     #[error("unavailable shift code")]
     UnavailableShiftCode,
 
+    /// Shift Code already redeemed
+    #[error("shift code already redeemed")]
+    ShiftCodeAlreadyRedeemed,
+    /// Launch shift game
+    #[error("launch a shift game to redeem the code")]
+    LaunchShiftGame,
+
     /// Failed to join tokio task
     #[error("tokio task join error")]
     TokioJoin(#[from] tokio::task::JoinError),

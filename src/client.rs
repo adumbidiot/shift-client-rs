@@ -147,7 +147,10 @@ impl Client {
             let alert_notice = page.alert_notice.ok_or(ShiftError::MissingAlertNotice)?;
             match alert_notice {
                 AlertNotice::ShiftCodeAlreadyRedeemed => {
-                    return Err(ShiftError::UnavailableShiftCode);
+                    return Err(ShiftError::ShiftCodeAlreadyRedeemed);
+                }
+                AlertNotice::LaunchShiftGame => {
+                    return Err(ShiftError::LaunchShiftGame);
                 }
             }
         }

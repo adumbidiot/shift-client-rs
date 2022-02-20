@@ -66,6 +66,9 @@ pub enum FromElementError {
 pub enum AlertNotice {
     /// A shift code was already redeemed
     ShiftCodeAlreadyRedeemed,
+
+    /// Launch a shift game to redeem codes
+    LaunchShiftGame,
 }
 
 impl AlertNotice {
@@ -75,6 +78,9 @@ impl AlertNotice {
 
         match text {
             "This SHiFT code has already been redeemed" => Ok(Self::ShiftCodeAlreadyRedeemed),
+            "To continue to redeem SHiFT codes, please launch a SHiFT-enabled title first!" => {
+                Ok(Self::LaunchShiftGame)
+            }
             _ => Err(FromElementError::UnknownText(text.to_string())),
         }
     }
