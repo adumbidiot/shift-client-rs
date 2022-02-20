@@ -1,5 +1,3 @@
-use reqwest::StatusCode;
-
 /// Library result type
 pub type ShiftResult<T> = Result<T, ShiftError>;
 
@@ -16,9 +14,7 @@ pub enum ShiftError {
     /// Reqwest HTTP error
     #[error("reqwest http error")]
     Reqwest(#[from] reqwest::Error),
-    /// invalid http status
-    #[error("invalid http status '{0}'")]
-    InvalidStatus(StatusCode),
+
     /// Invalid HTTP Redirect
     #[error("invalid http redirect '{0}'")]
     InvalidRedirect(String),

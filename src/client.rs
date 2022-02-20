@@ -107,12 +107,8 @@ impl Client {
             .header("X-CSRF-Token", &rewards_page.csrf_token)
             .header("X-Requested-With", "XMLHttpRequest")
             .send()
-            .await?;
-
-        let status = res.status();
-        if !status.is_success() {
-            return Err(ShiftError::InvalidStatus(status));
-        }
+            .await?
+            .error_for_status()?;
 
         let body = res.text().await?;
 
@@ -152,21 +148,16 @@ impl Client {
             res_to_html_transform(res, |html| Ok(CodeRedemptionPage::from_html(&html)?)).await?;
 
         let res = loop {
-            let res = self
+            let json: CodeRedemptionJson = self
                 .client
                 .get(&page.check_redemption_status_url)
                 .header("X-CSRF-Token", &page.csrf_token)
                 .header("X-Requested-With", "XMLHttpRequest")
                 .send()
+                .await?
+                .error_for_status()?
+                .json()
                 .await?;
-
-            let status = res.status();
-            if !status.is_success() {
-                return Err(ShiftError::InvalidStatus(status));
-            }
-
-            let body = res.text().await?;
-            let json: CodeRedemptionJson = serde_json::from_str(&body)?;
 
             tokio::time::sleep(Duration::from_secs(2)).await;
 
@@ -191,12 +182,7 @@ where
     F: Fn(Html) -> ShiftResult<T> + Send + 'static,
     T: Send + 'static,
 {
-    let status = res.status();
-    if !status.is_success() {
-        return Err(ShiftError::InvalidStatus(status));
-    }
-
-    let text = res.text().await?;
+    let text = res.error_for_status()?.text().await?;
     let ret = tokio::task::spawn_blocking(move || f(Html::parse_document(text.as_str()))).await??;
     Ok(ret)
 }

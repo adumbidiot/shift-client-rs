@@ -5,5 +5,6 @@ pub(crate) mod util;
 
 pub use crate::{
     client::Client,
+    error::ShiftError,
     types::RewardForm,
 };

@@ -2,16 +2,21 @@ use anyhow::{
     ensure,
     Context,
 };
+use reqwest::StatusCode;
 use shift_client::{
     types::RewardsPage,
     Client,
     RewardForm,
+    ShiftError,
 };
 use shift_orcz::Game;
-use std::io::{
-    stdin,
-    stdout,
-    Write,
+use std::{
+    io::{
+        stdin,
+        stdout,
+        Write,
+    },
+    time::Duration,
 };
 
 pub fn input() -> String {
@@ -82,10 +87,14 @@ async fn auto_loop(client: &Client) {
     };
     println!("Targeting game: {:?}", game);
 
-    let codes = match orcz_client.get_shift_codes(game).await {
+    let codes = match orcz_client
+        .get_shift_codes(game)
+        .await
+        .context("Failed to get shift codes")
+    {
         Ok(codes) => codes,
         Err(e) => {
-            eprintln!("Failed to get shift codes, got error: {:?}", e);
+            eprintln!("{:?}", e);
             eprintln!();
             return;
         }
@@ -105,16 +114,25 @@ async fn auto_loop(client: &Client) {
             println!("Source: {}", shift_code.source);
             println!();
 
-            println!("Would you like to redeem this code? (Y/N)");
-            let choice = input_yn();
-            println!();
-            if choice {
-                println!("Redeeming code...");
+            println!("Redeeming code...");
+            loop {
                 match redeem_code(client, &rewards_page, code.as_str().trim()).await {
-                    Ok(()) => {}
+                    Ok(()) => {
+                        break;
+                    }
                     Err(e) => {
                         eprintln!("{:?}", e);
                         eprintln!();
+
+                        if let Some(ShiftError::Reqwest(e)) = e.downcast_ref::<ShiftError>() {
+                            if let Some(StatusCode::TOO_MANY_REQUESTS) = e.status() {
+                                eprintln!("Encountered 429, backing off for 60 seconds...");
+                                tokio::time::sleep(Duration::from_secs(60)).await;
+                                continue;
+                            }
+                        }
+
+                        break;
                     }
                 }
             }
@@ -153,6 +171,7 @@ async fn redeem_form(client: &Client, form: &RewardForm) -> anyhow::Result<()> {
         .redeem(&form)
         .await
         .context("Failed to redeem code")?;
+
     if let Some(text) = redeem_response.text {
         println!("Response: {}", text);
     } else {
