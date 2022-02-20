@@ -124,9 +124,6 @@ async fn auto_loop(client: &Client) {
                         break;
                     }
                     Err(e) => {
-                        eprintln!("{:?}", e);
-                        eprintln!();
-
                         if let Some(ShiftError::Reqwest(e)) = e.downcast_ref::<ShiftError>() {
                             if let Some(StatusCode::TOO_MANY_REQUESTS) = e.status() {
                                 eprintln!("Encountered 429, backing off for 60 seconds...");
@@ -134,6 +131,9 @@ async fn auto_loop(client: &Client) {
                                 continue;
                             }
                         }
+
+                        eprintln!("{:?}", e);
+                        eprintln!();
 
                         break;
                     }
@@ -175,10 +175,12 @@ async fn redeem_form(client: &Client, form: &RewardForm) -> anyhow::Result<()> {
         .await
         .context("Failed to redeem code")?;
 
-    if let Some(text) = redeem_response.text {
-        println!("Response: {}", text);
-    } else {
-        eprintln!("Unknown Redeem Response: {:#?}", redeem_response);
+    if let Some(redeem_response) = redeem_response {
+        if let Some(text) = redeem_response.text {
+            println!("Response: {}", text);
+        } else {
+            eprintln!("Unknown Redeem Response: {:#?}", redeem_response);
+        }
     }
 
     Ok(())

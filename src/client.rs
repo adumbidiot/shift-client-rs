@@ -132,7 +132,7 @@ impl Client {
     }
 
     /// Redeem a code
-    pub async fn redeem(&self, form: &RewardForm) -> ShiftResult<CodeRedemptionJson> {
+    pub async fn redeem(&self, form: &RewardForm) -> ShiftResult<Option<CodeRedemptionJson>> {
         let res = self
             .client
             .post(CODE_REDEMPTIONS_URL)
@@ -151,6 +151,9 @@ impl Client {
                 }
                 AlertNotice::LaunchShiftGame => {
                     return Err(ShiftError::LaunchShiftGame);
+                }
+                AlertNotice::ShiftCodeRedeemed => {
+                    return Ok(None);
                 }
             }
         }
@@ -181,7 +184,7 @@ impl Client {
             }
         };
 
-        Ok(res)
+        Ok(Some(res))
     }
 }
 

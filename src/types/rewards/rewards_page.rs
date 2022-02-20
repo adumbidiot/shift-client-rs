@@ -69,6 +69,9 @@ pub enum AlertNotice {
 
     /// Launch a shift game to redeem codes
     LaunchShiftGame,
+
+    /// Redeemed a shift code
+    ShiftCodeRedeemed,
 }
 
 impl AlertNotice {
@@ -81,6 +84,7 @@ impl AlertNotice {
             "To continue to redeem SHiFT codes, please launch a SHiFT-enabled title first!" => {
                 Ok(Self::LaunchShiftGame)
             }
+            "Your code was successfully redeemed" => Ok(Self::ShiftCodeRedeemed),
             _ => Err(FromElementError::UnknownText(text.to_string())),
         }
     }
