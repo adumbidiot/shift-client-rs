@@ -18,7 +18,7 @@ allow-osi-fsf-free = "neither"
 confidence-threshold = 0.93
 default = "deny"
 private = { ignore = true }
-allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC" ]
+allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause" ]
 exceptions = []
 
 [[licenses.clarify]]
@@ -35,21 +35,27 @@ license-files = [
     { path = "LICENSE", hash = 0x001c7e6c },
 ]
 
+[[licenses.clarify]]
+name = "encoding_rs"
+version = "*"
+expression = "(Apache-2.0 OR MIT) AND BSD-3-Clause"
+license-files = [
+    { path = "COPYRIGHT", hash = 0x39f8ad31 }
+]
+
 [bans]
 multiple-versions = "deny"
 highlight = "all"
-skip = [    
-    # Blocked on xml5ever bumping time to 0.2.x
-    { name = "time", version = "0.1.44" },
-    
-    # Blocked on http updating bytes to 1.0.x
-    { name = "bytes", version = "1.0.0" },
-    
+skip = [
     # Blocked on phf_generator updating rand to 0.8.x
     { name = "getrandom", version = "0.1.16" },
     { name = "rand_core", version = "0.5.1" },
     { name = "rand_chacha", version = "0.2.2" },
     { name = "rand", version = "0.7.3" },
+    
+    # Blocked on scraper updating cssparser
+    { name = "itoa", version = "0.4.8" },
+    { name = "phf_shared", version = "0.8.0" },
 ]
 
 # Mostly soundness denies since the advisory lacks a section for soundess bugs
