@@ -60,19 +60,18 @@ impl Client {
     /// Logs in and allows making other requests
     pub async fn login(&self) -> ShiftResult<AccountPage> {
         let home_page = self.get_home_page().await?;
-        let lock = self.client_data.read().expect("client data poisoned");
-        let res = self
-            .client
-            .post(SESSIONS_URL)
-            .form(&[
+
+        let req = {
+            let lock = self.client_data.read().expect("client data poisoned");
+            self.client.post(SESSIONS_URL).form(&[
                 ("utf8", "✓"),
                 ("authenticity_token", &home_page.csrf_token),
                 ("user[email]", &lock.email),
                 ("user[password]", &lock.password),
                 ("commit", "SIGN IN"),
             ])
-            .send()
-            .await?;
+        };
+        let res = req.send().await?;
 
         match res.url().as_str() {
             header @ "https://shift.gearboxsoftware.com/home?redirect_to=false" => {
