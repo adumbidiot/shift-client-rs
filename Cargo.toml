@@ -18,7 +18,7 @@ thiserror = "1.0.30"
 tokio = { version = "1.17.0", features = [ "time" ] }
 
 # Optional
-anyhow = { version = "1.0.55", optional = true }
+anyhow = { version = "1.0.56", optional = true }
 shift-orcz = { path = "lib/shift-orcz", optional = true }
 
 [dev-dependencies]
