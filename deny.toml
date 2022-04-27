@@ -60,6 +60,11 @@ skip = [
     # Blocked on many crates moving to time 0.3
     { name = "time", version = "0.2.0" },
     { name = "time-macros", version = "0.1.1" },
+    
+    # Blocked on cssparser updating phf
+    { name = "phf", version = "0.8.0" },
+    { name = "phf_generator", version = "0.8.0" },
+    { name = "phf_codegen", version = "0.8.0" },
 ]
 
 # Mostly soundness denies since the advisory lacks a section for soundess bugs
