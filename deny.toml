@@ -18,7 +18,7 @@ allow-osi-fsf-free = "neither"
 confidence-threshold = 0.93
 default = "deny"
 private = { ignore = true }
-allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause", "OpenSSL" ]
+allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause", "OpenSSL", "Unicode-DFS-2016" ]
 exceptions = []
 
 [[licenses.clarify]]
@@ -57,14 +57,17 @@ skip = [
     { name = "itoa", version = "0.4.8" },
     { name = "phf_shared", version = "0.8.0" },
     
-    # Blocked on many crates moving to time 0.3
-    { name = "time", version = "0.2.0" },
-    { name = "time-macros", version = "0.1.1" },
-    
     # Blocked on cssparser updating phf
     { name = "phf", version = "0.8.0" },
     { name = "phf_generator", version = "0.8.0" },
     { name = "phf_codegen", version = "0.8.0" },
+    
+    # Blocked on schannel updating windows-sys
+    { name = "windows_x86_64_msvc", version = "0.36.1" },
+    { name = "windows-sys", version = "0.36.1" },
+    
+    # Blocked on cookie-store updating idna
+    { name = "idna", version = "0.2.3" },
 ]
 
 # Mostly soundness denies since the advisory lacks a section for soundess bugs

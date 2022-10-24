@@ -46,6 +46,7 @@ enum IssueDateToken {
     #[token("...", logos::skip)]
     #[token("verified", logos::skip)]
     #[token("\u{a0}", logos::skip)]
+    #[token("n/a", logos::skip)]
     Error,
 }
 
