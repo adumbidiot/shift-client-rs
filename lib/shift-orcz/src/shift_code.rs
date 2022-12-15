@@ -3,10 +3,7 @@ mod issue_date;
 use self::issue_date::parse_issue_date;
 use crate::code::Code;
 use once_cell::sync::Lazy;
-use scraper::{
-    ElementRef,
-    Selector,
-};
+use scraper::{ElementRef, Selector};
 use time::Date;
 
 pub const PC_CODE_INDEX: usize = 0;

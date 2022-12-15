@@ -1,9 +1,5 @@
 use crate::util::extract_by_name;
-use scraper::{
-    ElementRef,
-    Html,
-    Selector,
-};
+use scraper::{ElementRef, Html, Selector};
 
 /// Error that may occur while parsing a [`RewardForm`].
 pub type FromHtmlError = FromElementError;

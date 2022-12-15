@@ -1,8 +1,5 @@
 use crate::util::extract_csrf_token;
-use scraper::{
-    Html,
-    Selector,
-};
+use scraper::{Html, Selector};
 
 /// Error that may occur while parsing an [`AccountPage`].
 #[derive(Debug, thiserror::Error)]

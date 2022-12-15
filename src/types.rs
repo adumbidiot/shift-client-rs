@@ -5,10 +5,5 @@ pub mod rewards;
 pub use self::{
     account_page::AccountPage,
     home_page::HomePage,
-    rewards::{
-        CodeRedemptionJson,
-        CodeRedemptionPage,
-        RewardForm,
-        RewardsPage,
-    },
+    rewards::{CodeRedemptionJson, CodeRedemptionPage, RewardForm, RewardsPage},
 };

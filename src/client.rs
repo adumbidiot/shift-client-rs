@@ -1,26 +1,13 @@
 use crate::{
-    error::{
-        ShiftError,
-        ShiftResult,
-    },
+    error::{ShiftError, ShiftResult},
     types::{
-        rewards::{
-            AlertNotice,
-            CodeRedemptionJson,
-            CodeRedemptionPage,
-            RewardForm,
-            RewardsPage,
-        },
-        AccountPage,
-        HomePage,
+        rewards::{AlertNotice, CodeRedemptionJson, CodeRedemptionPage, RewardForm, RewardsPage},
+        AccountPage, HomePage,
     },
 };
 use scraper::Html;
 use std::{
-    sync::{
-        Arc,
-        RwLock,
-    },
+    sync::{Arc, RwLock},
     time::Duration,
 };
 

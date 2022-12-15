@@ -3,12 +3,7 @@ pub mod code;
 mod game;
 pub mod shift_code;
 
-pub use crate::{
-    client::Client,
-    code::Code,
-    game::Game,
-    shift_code::ShiftCode,
-};
+pub use crate::{client::Client, code::Code, game::Game, shift_code::ShiftCode};
 
 /// Library Result Type
 pub type OrczResult<T> = Result<T, OrczError>;
