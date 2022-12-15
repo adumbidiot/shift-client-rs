@@ -1,21 +1,9 @@
-use anyhow::{
-    ensure,
-    Context,
-};
+use anyhow::{ensure, Context};
 use reqwest::StatusCode;
-use shift_client::{
-    types::RewardsPage,
-    Client,
-    RewardForm,
-    ShiftError,
-};
+use shift_client::{types::RewardsPage, Client, RewardForm, ShiftError};
 use shift_orcz::Game;
 use std::{
-    io::{
-        stdin,
-        stdout,
-        Write,
-    },
+    io::{stdin, stdout, Write},
     time::Duration,
 };
 

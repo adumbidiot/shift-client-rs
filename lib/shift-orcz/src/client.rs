@@ -1,13 +1,6 @@
-use crate::{
-    Game,
-    OrczResult,
-    ShiftCode,
-};
+use crate::{Game, OrczResult, ShiftCode};
 use once_cell::sync::Lazy;
-use scraper::{
-    Html,
-    Selector,
-};
+use scraper::{Html, Selector};
 use time::Date;
 
 /// Client

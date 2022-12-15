@@ -1,9 +1,5 @@
 use once_cell::sync::Lazy;
-use scraper::{
-    ElementRef,
-    Html,
-    Selector,
-};
+use scraper::{ElementRef, Html, Selector};
 
 /// Extract the value of an element by the name attr
 pub(crate) fn extract_by_name<'a>(element: ElementRef<'a>, name: &str) -> Option<&'a str> {

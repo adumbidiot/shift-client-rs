@@ -1,8 +1,5 @@
 use once_cell::sync::Lazy;
-use scraper::{
-    ElementRef,
-    Selector,
-};
+use scraper::{ElementRef, Selector};
 
 static SPAN_SELECTOR: Lazy<Selector> =
     Lazy::new(|| Selector::parse("span[style=\"color:red\"]").expect("invalid span selector"));

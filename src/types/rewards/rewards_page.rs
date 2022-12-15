@@ -1,10 +1,6 @@
 use crate::util::extract_csrf_token;
 use once_cell::sync::Lazy;
-use scraper::{
-    ElementRef,
-    Html,
-    Selector,
-};
+use scraper::{ElementRef, Html, Selector};
 
 static ALERT_NOTICE_SELECTOR: Lazy<Selector> =
     Lazy::new(|| Selector::parse(".alert.notice p").expect("invalid ALERT_NOTICE_SELECTOR"));
