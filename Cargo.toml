@@ -25,7 +25,7 @@ shift-orcz = { path = "lib/shift-orcz", optional = true }
 tokio = { version = "1.23.0", features = [ "macros" ] }
 
 [features]
-default = [ "reqwest/default-tls" ]
+default = [ "reqwest/rustls-tls" ]
 
 native-tls = [ "reqwest/native-tls" ]
 rustls-tls = [ "reqwest/rustls-tls" ]
@@ -40,6 +40,7 @@ cli = [
 lto = "fat"
 codegen-units = 1
 opt-level = 3
+strip = "symbols"
 
 [workspace]
 members = [ 
