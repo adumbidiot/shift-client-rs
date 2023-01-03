@@ -3,3 +3,6 @@
 
 # Ignore Test data
 **/test_data/*.* linguist-detectable=false
+
+*.rs test eol=lf
+*.toml test eol=lf
