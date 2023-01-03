@@ -1,28 +1,12 @@
+mod util;
+
+use crate::util::input;
+use crate::util::input_yn;
 use anyhow::{ensure, Context};
 use reqwest::StatusCode;
 use shift_client::{types::RewardsPage, Client, RewardForm, ShiftError};
 use shift_orcz::Game;
-use std::{
-    io::{stdin, stdout, Write},
-    time::Duration,
-};
-
-pub fn input() -> String {
-    let mut s = String::new();
-    let _ = stdout().flush();
-    let _ = stdin().read_line(&mut s);
-    if let Some('\n') = s.chars().next_back() {
-        s.pop();
-    }
-    if let Some('\r') = s.chars().next_back() {
-        s.pop();
-    }
-    s
-}
-
-pub fn input_yn() -> bool {
-    matches!(input().chars().next(), Some('Y') | Some('y'))
-}
+use std::time::Duration;
 
 async fn manual_loop(client: &Client) {
     let rewards_page = match client.get_rewards_page().await {
@@ -140,7 +124,7 @@ async fn redeem_code(
     let forms = client
         .get_reward_forms(rewards_page, code.trim())
         .await
-        .context("Failed to get code")?;
+        .context("failed to get code")?;
 
     ensure!(!forms.is_empty(), "No forms retrieved for code");
 
@@ -172,27 +156,11 @@ async fn redeem_form(client: &Client, form: &RewardForm) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn main() {
-    let code = match real_main() {
-        Ok(()) => 0,
-        Err(e) => {
-            eprintln!("{:?}", e);
-            1
-        }
-    };
-
-    std::process::exit(code);
-}
-
-fn real_main() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<()> {
     let tokio_rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
-        .build()
-        .context("failed to build tokio runtime")?;
-
-    tokio_rt.block_on(async_main())?;
-
-    Ok(())
+        .build()?;
+    tokio_rt.block_on(async_main())
 }
 
 async fn async_main() -> anyhow::Result<()> {

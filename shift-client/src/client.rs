@@ -61,8 +61,8 @@ impl Client {
         let res = req.send().await?;
 
         match res.url().as_str() {
-            header @ "https://shift.gearboxsoftware.com/home?redirect_to=false" => {
-                return Err(ShiftError::InvalidRedirect(header.into()));
+            "https://shift.gearboxsoftware.com/home?redirect_to=false" => {
+                return Err(ShiftError::IncorrectEmailOrPassword);
             }
             "https://shift.gearboxsoftware.com/account" => {}
             url => {
