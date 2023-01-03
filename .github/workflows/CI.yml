@@ -6,8 +6,9 @@ name: Rust
   pull_request:
     branches:
       - master
+      
 jobs:
-  Lint:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +24,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-lint-cargo-${{ hashFiles('**/Cargo.lock') }}
           
       - name: Fmt
         run: cargo fmt -- --check
@@ -31,7 +32,8 @@ jobs:
       - name: Clippy
         run: cargo clippy --tests --all --all-features -- -D warnings
           
-  Deny:
+  deny:
+    name: Deny
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,7 +42,8 @@ jobs:
       - name: Deny
         uses: EmbarkStudios/cargo-deny-action@v1.4.0
       
-  Build:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -55,7 +58,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-build-cargo-${{ hashFiles('**/Cargo.lock') }}
           
       - name: Build
         run: cargo build --all --verbose
