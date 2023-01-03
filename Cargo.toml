@@ -1,7 +1,9 @@
 [workspace]
 members = [ 
-    "lib/shift-orcz",
+    "lib/*",
+    
     "shift-client",
+    "shift-client-cli",
 ]
 
 [profile.release]

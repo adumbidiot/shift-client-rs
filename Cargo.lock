@@ -1233,14 +1233,23 @@ dependencies = [
 name = "shift-client"
 version = "0.0.0"
 dependencies = [
- "anyhow",
  "once_cell",
  "reqwest",
  "scraper",
  "serde",
  "serde_json",
- "shift-orcz",
  "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "shift-client-cli"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "reqwest",
+ "shift-client",
+ "shift-orcz",
  "tokio",
 ]
 

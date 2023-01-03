@@ -17,7 +17,7 @@ tokio = { version = "1.23.0", features = [ "rt" ] }
 tokio = { version = "1.23.0", features = [ "macros" ] }
 
 [features]
-default = [ "reqwest/default-tls" ]
+default = [ "reqwest/rustls-tls" ]
 
 native-tls = [ "reqwest/native-tls" ]
 rustls-tls = [ "reqwest/rustls-tls" ]

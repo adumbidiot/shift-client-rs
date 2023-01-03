@@ -12,15 +12,19 @@ pub type InvalidAccountPage = crate::types::account_page::FromHtmlError;
 #[derive(Debug, thiserror::Error)]
 pub enum ShiftError {
     /// Reqwest HTTP error
-    #[error("reqwest http error")]
+    #[error(transparent)]
     Reqwest(#[from] reqwest::Error),
+
+    /// The password or email was incorrect
+    #[error("incorrect email or password")]
+    IncorrectEmailOrPassword,
 
     /// Invalid HTTP Redirect
     #[error("invalid http redirect '{0}'")]
     InvalidRedirect(String),
 
     /// Json Error
-    #[error("json parse error")]
+    #[error(transparent)]
     Json(#[from] serde_json::Error),
 
     /// Invalid Rewards page
