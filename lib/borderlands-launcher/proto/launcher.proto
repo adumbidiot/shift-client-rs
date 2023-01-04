@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package launcher;
+
+message AvailableData {
+    optional DynamicContentUpdateInfo NewsInfo = 1;
+    optional DynamicContentUpdateInfo BackgroundInfo = 2;
+    repeated NewsStory NewsStories = 3;
+}
+
+message DynamicContentUpdateInfo {
+    int32 LastUpdated = 1;
+    string DataUrl = 2;
+}
+
+message NewsStory {
+    string Headline = 1;
+    int32 Date = 2;
+    string Url = 3;
+    string FullStory = 4;
+}
