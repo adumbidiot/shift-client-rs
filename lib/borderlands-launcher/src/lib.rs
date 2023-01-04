@@ -3,7 +3,7 @@ mod protos {
     include!("generated/launcher.rs");
 }
 
-pub use self::protos::AvailableData;
+pub use self::protos::*;
 use async_compression::tokio::bufread::GzipDecoder;
 use bytes::BytesMut;
 use futures_util::TryStreamExt;
