@@ -15,7 +15,7 @@ futures-util = { version = "0.3.25", default-features = false }
 prost = "0.11.5"
 reqwest = { version = "0.11.13", features = [ "gzip", "deflate", "stream" ], default-features = false }
 thiserror = "1.0.38"
-tokio = { version = "1.23.0", default-features = false }
+tokio = { version = "1.23.1", default-features = false }
 tokio-util = { version = "0.7.4", features = [ "io" ], default-features = false }
 
 # Optional
@@ -23,7 +23,7 @@ anyhow = { version = "1.0.68", optional = true }
 prost-build = { version = "0.11.5", optional = true }
 
 [dev-dependencies]
-tokio = { version = "1.23.0", features = ["macros"] }
+tokio = { version = "1.23.1", features = ["macros"] }
 
 [features]
 default = ["rustls-tls"]
