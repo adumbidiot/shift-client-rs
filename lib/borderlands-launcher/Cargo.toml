@@ -16,7 +16,7 @@ prost = "0.11.6"
 reqwest = { version = "0.11.13", features = [ "gzip", "deflate", "stream" ], default-features = false }
 thiserror = "1.0.38"
 tokio = { version = "1.25.0", default-features = false }
-tokio-util = { version = "0.7.4", features = [ "io" ], default-features = false }
+tokio-util = { version = "0.7.7", features = [ "io" ], default-features = false }
 
 # Optional
 anyhow = { version = "1.0.69", optional = true }
