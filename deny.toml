@@ -63,6 +63,10 @@ skip = [
     
     # Blocked on cookie-store updating idna
     { name = "idna", version = "0.2.3" },
+    
+    # Blocked on ecosystem updating to windows 0.45.0
+    { name = "windows-sys", version = "0.42.0" },
+    { name = "windows", version = "0.42.0" },
 ]
 
 deny = [    
