@@ -1,6 +1,3 @@
-mod issue_date;
-
-use self::issue_date::parse_issue_date;
 use crate::code::Code;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -15,7 +12,7 @@ pub const XBOX_CODE_INDEX: usize = 2;
 static TD_SELECTOR: Lazy<Selector> =
     Lazy::new(|| Selector::parse("td").expect("invalid TD_SELECTOR"));
 static DATE_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2}), (?P<year_2>\d{4}))").unwrap()
+    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2})(th|nd)? ?,? (?P<year_2>\d{4}))").unwrap()
 });
 
 /// Error that may occur while parsing a ShiftCode from an element
@@ -48,10 +45,6 @@ pub enum FromElementError {
     /// Missing PC Code
     #[error("missing xbox code")]
     MissingXboxCode,
-
-    /// Invalid Issue date
-    #[error("invalid issue date")]
-    InvalidIssueDate(#[from] self::issue_date::ParseIssueDateError),
 
     /// Issue date missing year
     #[error("issue date missing year")]
@@ -139,62 +132,7 @@ impl ShiftCode {
             .and_then(|el| el.text().next())
             .ok_or(FromElementError::MissingIssueDate)?
             .trim();
-        let issue_date = if issue_date_str == "Unknown" {
-            None
-        } else {
-            let captures = DATE_REGEX
-                .captures(issue_date_str)
-                .ok_or(FromElementError::MissingIssueDate)?;
-            let y = captures
-                .name("year_1")
-                .or_else(|| captures.name("year_2"))
-                .ok_or(FromElementError::IssueDateMissingYear)?
-                .as_str()
-                .parse::<i32>()
-                .map_err(FromElementError::IssueDateInvalidYear)?;
-            let m = captures
-                .name("month_1")
-                .map(|month| {
-                    let month = month
-                        .as_str()
-                        .parse::<u8>()
-                        .map_err(FromElementError::IssueDateInvalidMonthInt)?;
-                    let month: time::Month = month
-                        .try_into()
-                        .map_err(FromElementError::IssueDateInvalidMonth)?;
-                    Ok(month)
-                })
-                .or_else(|| {
-                    captures.name("month_2").map(|month| match month.as_str() {
-                        "January" | "Jan" => Ok(time::Month::January),
-                        "February" | "Feb" => Ok(time::Month::February),
-                        "March" | "Mar" => Ok(time::Month::March),
-                        "April" | "Apr" => Ok(time::Month::April),
-                        "May" => Ok(time::Month::May),
-                        "June" | "Jun" => Ok(time::Month::June),
-                        "July" | "Jul" => Ok(time::Month::July),
-                        "August" | "Aug" => Ok(time::Month::August),
-                        "September" | "Sep" => Ok(time::Month::September),
-                        "October" | "Oct" => Ok(time::Month::October),
-                        "November" | "Nov" => Ok(time::Month::November),
-                        "December" | "Dec" => Ok(time::Month::December),
-                        month => Err(FromElementError::IssueDateInvalidMonthStr(month.into())),
-                    })
-                })
-                .ok_or(FromElementError::IssueDateMissingMonth)??;
-            let d = captures
-                .name("day_1")
-                .or_else(|| captures.name("day_2"))
-                .ok_or(FromElementError::IssueDateMissingDay)?
-                .as_str()
-                .parse::<u8>()
-                .map_err(FromElementError::IssueDateInvalidDay)?;
-
-            let date = Date::from_calendar_date(y, m, d)
-                .map_err(FromElementError::IssueDateInvalidDate)?;
-
-            Some(date)
-        };
+        let issue_date = parse_issue_date_str(issue_date_str)?;
         let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
         let pc = Code::from_element(iter.next().ok_or(FromElementError::MissingPcCode)?)?;
@@ -234,11 +172,7 @@ impl ShiftCode {
             .ok_or(FromElementError::MissingIssueDate)?
             .trim()
             .replace("??", "1"); // TODO: Consider making day optional
-        let issue_date = if issue_date_str == "Unknown" {
-            None
-        } else {
-            Some(parse_issue_date(&issue_date_str)?)
-        };
+        let issue_date = parse_issue_date_str(&issue_date_str)?;
 
         let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
@@ -293,4 +227,63 @@ fn process_rewards_node(element: ElementRef) -> String {
     }
 
     ret
+}
+
+fn parse_issue_date_str(issue_date_str: &str) -> Result<Option<time::Date>, FromElementError> {
+    if dbg!(issue_date_str) == "Unknown" {
+        Ok(None)
+    } else {
+        let captures = DATE_REGEX
+            .captures(issue_date_str)
+            .ok_or(FromElementError::MissingIssueDate)?;
+        let y = captures
+            .name("year_1")
+            .or_else(|| captures.name("year_2"))
+            .ok_or(FromElementError::IssueDateMissingYear)?
+            .as_str()
+            .parse::<i32>()
+            .map_err(FromElementError::IssueDateInvalidYear)?;
+        let m = captures
+            .name("month_1")
+            .map(|month| {
+                let month = month
+                    .as_str()
+                    .parse::<u8>()
+                    .map_err(FromElementError::IssueDateInvalidMonthInt)?;
+                let month: time::Month = month
+                    .try_into()
+                    .map_err(FromElementError::IssueDateInvalidMonth)?;
+                Ok(month)
+            })
+            .or_else(|| {
+                captures.name("month_2").map(|month| match month.as_str() {
+                    "January" | "Jan" => Ok(time::Month::January),
+                    "February" | "Feb" => Ok(time::Month::February),
+                    "March" | "Mar" => Ok(time::Month::March),
+                    "April" | "Apr" => Ok(time::Month::April),
+                    "May" => Ok(time::Month::May),
+                    "June" | "Jun" => Ok(time::Month::June),
+                    "July" | "Jul" => Ok(time::Month::July),
+                    "August" | "Aug" => Ok(time::Month::August),
+                    "September" | "Sep" | "Sept" => Ok(time::Month::September),
+                    "October" | "Oct" => Ok(time::Month::October),
+                    "November" | "Nov" => Ok(time::Month::November),
+                    "December" | "Dec" => Ok(time::Month::December),
+                    month => Err(FromElementError::IssueDateInvalidMonthStr(month.into())),
+                })
+            })
+            .ok_or(FromElementError::IssueDateMissingMonth)??;
+        let d = captures
+            .name("day_1")
+            .or_else(|| captures.name("day_2"))
+            .ok_or(FromElementError::IssueDateMissingDay)?
+            .as_str()
+            .parse::<u8>()
+            .map_err(FromElementError::IssueDateInvalidDay)?;
+
+        let date =
+            Date::from_calendar_date(y, m, d).map_err(FromElementError::IssueDateInvalidDate)?;
+
+        Ok(Some(date))
+    }
 }
