@@ -3,7 +3,7 @@ use scraper::{ElementRef, Html, Selector};
 
 /// Extract the value of an element by the name attr
 pub(crate) fn extract_by_name<'a>(element: ElementRef<'a>, name: &str) -> Option<&'a str> {
-    let selector = Selector::parse(&format!("[name=\"{}\"][value]", name)).ok()?;
+    let selector = Selector::parse(&format!("[name=\"{name}\"][value]")).ok()?;
     element.select(&selector).next()?.value().attr("value")
 }
 
