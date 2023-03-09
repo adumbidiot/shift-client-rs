@@ -85,7 +85,13 @@ async fn auto_loop(client: &Client) {
         {
             println!("Code: {}", code.as_str());
             println!("Reward: {}", shift_code.rewards);
-            println!("Issue Date: {}", shift_code.issue_date);
+            println!(
+                "Issue Date: {}",
+                shift_code
+                    .issue_date
+                    .map(|date| format!("{date}"))
+                    .unwrap_or_else(|| "Unknown".into())
+            );
             println!("Source: {}", shift_code.source);
             println!();
 
