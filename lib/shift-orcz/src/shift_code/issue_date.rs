@@ -65,16 +65,16 @@ pub enum ParseIssueDateError {
     #[error("missing day")]
     MissingDay,
 
-    #[error("invalid token `{0}`")]
+    #[error("invalid token \"{0}\"")]
     InvalidToken(String),
 
     #[error(transparent)]
     TimeComponentRange(#[from] time::error::ComponentRange),
 
-    #[error("invalid year '{0}'")]
+    #[error("invalid year \"{0}\"")]
     InvalidYear(u32, #[source] std::num::TryFromIntError),
 
-    #[error("invalid day '{0}'")]
+    #[error("invalid day \"{0}\"")]
     InvalidDay(u32, #[source] std::num::TryFromIntError),
 }
 

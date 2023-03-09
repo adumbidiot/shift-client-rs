@@ -61,8 +61,10 @@ pub struct ShiftCode {
     /// The source
     pub source: String,
 
-    /// The issue date
-    pub issue_date: Date,
+    /// The issue date.
+    ///
+    /// If None, it is unknown.
+    pub issue_date: Option<Date>,
 
     /// The rewards
     pub rewards: String,
@@ -96,8 +98,11 @@ impl ShiftCode {
             .and_then(|el| el.text().next())
             .ok_or(FromElementError::MissingIssueDate)?
             .trim();
-        let issue_date = parse_issue_date(issue_date_str)?;
-
+        let issue_date = if issue_date_str == "Unknown" {
+            None
+        } else {
+            Some(parse_issue_date(issue_date_str)?)
+        };
         let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
         let pc = Code::from_element(iter.next().ok_or(FromElementError::MissingPcCode)?)?;
@@ -137,7 +142,11 @@ impl ShiftCode {
             .ok_or(FromElementError::MissingIssueDate)?
             .trim()
             .replace("??", "1"); // TODO: Consider making day optional
-        let issue_date = parse_issue_date(&issue_date_str)?;
+        let issue_date = if issue_date_str == "Unknown" {
+            None
+        } else {
+            Some(parse_issue_date(&issue_date_str)?)
+        };
 
         let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
