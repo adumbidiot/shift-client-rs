@@ -15,7 +15,7 @@ pub const XBOX_CODE_INDEX: usize = 2;
 static TD_SELECTOR: Lazy<Selector> =
     Lazy::new(|| Selector::parse("td").expect("invalid TD_SELECTOR"));
 static DATE_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_2>[[:alpha:]]*?) (?P<day_2>\d{1,2}), (?P<year_2>\d{4}))").unwrap()
+    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2}), (?P<year_2>\d{4}))").unwrap()
 });
 
 /// Error that may occur while parsing a ShiftCode from an element
@@ -122,7 +122,7 @@ pub struct ShiftCode {
 
 impl ShiftCode {
     /// Parse a [`ShiftCode`] from a non-bl3 element.
-    pub(crate) fn from_element(row: ElementRef, is_bl: bool) -> Result<Self, FromElementError> {
+    pub(crate) fn from_element(row: ElementRef) -> Result<Self, FromElementError> {
         let mut iter = row.select(&TD_SELECTOR);
 
         let source = iter
@@ -141,7 +141,7 @@ impl ShiftCode {
             .trim();
         let issue_date = if issue_date_str == "Unknown" {
             None
-        } else if is_bl {
+        } else {
             let captures = DATE_REGEX
                 .captures(issue_date_str)
                 .ok_or(FromElementError::MissingIssueDate)?;
@@ -171,10 +171,10 @@ impl ShiftCode {
                         "March" | "Mar" => Ok(time::Month::March),
                         "April" | "Apr" => Ok(time::Month::April),
                         "May" => Ok(time::Month::May),
-                        "June" => Ok(time::Month::June),
-                        "July" => Ok(time::Month::July),
-                        "August" => Ok(time::Month::August),
-                        "September" => Ok(time::Month::September),
+                        "June" | "Jun" => Ok(time::Month::June),
+                        "July" | "Jul" => Ok(time::Month::July),
+                        "August" | "Aug" => Ok(time::Month::August),
+                        "September" | "Sep" => Ok(time::Month::September),
                         "October" | "Oct" => Ok(time::Month::October),
                         "November" | "Nov" => Ok(time::Month::November),
                         "December" | "Dec" => Ok(time::Month::December),
@@ -194,8 +194,6 @@ impl ShiftCode {
                 .map_err(FromElementError::IssueDateInvalidDate)?;
 
             Some(date)
-        } else {
-            Some(parse_issue_date(issue_date_str)?)
         };
         let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
