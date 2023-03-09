@@ -18,6 +18,16 @@ impl Game {
         }
     }
 
+    /// Check whether this game is bl
+    pub fn is_bl(self) -> bool {
+        matches!(self, Self::Borderlands)
+    }
+
+    /// Check whether this game is bl2
+    pub fn is_bl2(self) -> bool {
+        matches!(self, Self::Borderlands2)
+    }
+
     /// Check whether this game is bl3
     pub fn is_bl3(self) -> bool {
         matches!(self, Self::Borderlands3)

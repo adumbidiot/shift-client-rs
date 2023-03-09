@@ -3,7 +3,9 @@ mod issue_date;
 use self::issue_date::parse_issue_date;
 use crate::code::Code;
 use once_cell::sync::Lazy;
-use scraper::{ElementRef, Selector};
+use regex::Regex;
+use scraper::ElementRef;
+use scraper::Selector;
 use time::Date;
 
 pub const PC_CODE_INDEX: usize = 0;
@@ -12,6 +14,9 @@ pub const XBOX_CODE_INDEX: usize = 2;
 
 static TD_SELECTOR: Lazy<Selector> =
     Lazy::new(|| Selector::parse("td").expect("invalid TD_SELECTOR"));
+static DATE_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_2>[[:alpha:]]*?) (?P<day_2>\d{1,2}), (?P<year_2>\d{4}))").unwrap()
+});
 
 /// Error that may occur while parsing a ShiftCode from an element
 #[derive(Debug, thiserror::Error)]
@@ -48,6 +53,42 @@ pub enum FromElementError {
     #[error("invalid issue date")]
     InvalidIssueDate(#[from] self::issue_date::ParseIssueDateError),
 
+    /// Issue date missing year
+    #[error("issue date missing year")]
+    IssueDateMissingYear,
+
+    /// Issue date missing month
+    #[error("issue date missing month")]
+    IssueDateMissingMonth,
+
+    /// Issue date missing day
+    #[error("issue date missing day")]
+    IssueDateMissingDay,
+
+    /// Issue date invalid year
+    #[error("issue date missing year")]
+    IssueDateInvalidYear(#[source] std::num::ParseIntError),
+
+    /// Issue date invalid month
+    #[error("issue date missing month int")]
+    IssueDateInvalidMonthInt(#[source] std::num::ParseIntError),
+
+    /// Issue date invalid month
+    #[error("issue date missing month")]
+    IssueDateInvalidMonth(#[source] time::error::ComponentRange),
+
+    /// Invalid month str
+    #[error("invalid month \"{0}\"")]
+    IssueDateInvalidMonthStr(Box<str>),
+
+    /// Issue date invalid day
+    #[error("issue date missing day")]
+    IssueDateInvalidDay(#[source] std::num::ParseIntError),
+
+    /// Invalid issue date
+    #[error("invalid date")]
+    IssueDateInvalidDate(#[source] time::error::ComponentRange),
+
     /// Invalid code
     #[error("invalid code")]
     InvalidCode(#[from] crate::code::FromElementError),
@@ -81,7 +122,7 @@ pub struct ShiftCode {
 
 impl ShiftCode {
     /// Parse a [`ShiftCode`] from a non-bl3 element.
-    pub(crate) fn from_element(row: ElementRef) -> Result<Self, FromElementError> {
+    pub(crate) fn from_element(row: ElementRef, is_bl: bool) -> Result<Self, FromElementError> {
         let mut iter = row.select(&TD_SELECTOR);
 
         let source = iter
@@ -100,6 +141,59 @@ impl ShiftCode {
             .trim();
         let issue_date = if issue_date_str == "Unknown" {
             None
+        } else if is_bl {
+            let captures = DATE_REGEX
+                .captures(dbg!(issue_date_str))
+                .ok_or(FromElementError::MissingIssueDate)?;
+            let y = captures
+                .name("year_1")
+                .or_else(|| captures.name("year_2"))
+                .ok_or(FromElementError::IssueDateMissingYear)?
+                .as_str()
+                .parse::<i32>()
+                .map_err(FromElementError::IssueDateInvalidYear)?;
+            let m = captures
+                .name("month_1")
+                .map(|month| {
+                    let month = month
+                        .as_str()
+                        .parse::<u8>()
+                        .map_err(FromElementError::IssueDateInvalidMonthInt)?;
+                    let month: time::Month = month
+                        .try_into()
+                        .map_err(FromElementError::IssueDateInvalidMonth)?;
+                    Ok(month)
+                })
+                .or_else(|| {
+                    captures.name("month_2").map(|month| match month.as_str() {
+                        "January" | "Jan" => Ok(time::Month::January),
+                        "February" | "Feb" => Ok(time::Month::February),
+                        "March" | "Mar" => Ok(time::Month::March),
+                        "April" | "Apr" => Ok(time::Month::April),
+                        "May" => Ok(time::Month::May),
+                        "June" => Ok(time::Month::June),
+                        "July" => Ok(time::Month::July),
+                        "August" => Ok(time::Month::August),
+                        "September" => Ok(time::Month::September),
+                        "October" | "Oct" => Ok(time::Month::October),
+                        "November" | "Nov" => Ok(time::Month::November),
+                        "December" | "Dec" => Ok(time::Month::December),
+                        month => Err(FromElementError::IssueDateInvalidMonthStr(month.into())),
+                    })
+                })
+                .ok_or(FromElementError::IssueDateMissingMonth)??;
+            let d = captures
+                .name("day_1")
+                .or_else(|| captures.name("day_2"))
+                .ok_or(FromElementError::IssueDateMissingDay)?
+                .as_str()
+                .parse::<u8>()
+                .map_err(FromElementError::IssueDateInvalidDay)?;
+
+            let date = Date::from_calendar_date(y, m, d)
+                .map_err(FromElementError::IssueDateInvalidDate)?;
+
+            Some(date)
         } else {
             Some(parse_issue_date(issue_date_str)?)
         };

@@ -89,7 +89,7 @@ pub fn parse_issue_date(s: &str) -> Result<Date, ParseIssueDateError> {
         match token {
             IssueDateToken::Month(n) => {
                 if month.is_none() {
-                    month = Some(n)
+                    month = Some(n);
                 }
             }
             IssueDateToken::Number(n) => match (day.is_none(), year.is_none()) {
@@ -97,13 +97,13 @@ pub fn parse_issue_date(s: &str) -> Result<Date, ParseIssueDateError> {
                     day = Some(
                         n.try_into()
                             .map_err(|e| ParseIssueDateError::InvalidDay(n, e))?,
-                    )
+                    );
                 }
                 (false, true) => {
                     year = Some(
                         n.try_into()
                             .map_err(|e| ParseIssueDateError::InvalidYear(n, e))?,
-                    )
+                    );
                 }
                 (false, false) => {}
                 _ => {}

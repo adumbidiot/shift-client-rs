@@ -85,7 +85,7 @@ fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, Extrac
     } else {
         html.select(&TABLE_BODY_ROW_SELECTOR)
             .skip(1) // Skip title
-            .map(ShiftCode::from_element)
+            .map(|el| ShiftCode::from_element(el, game.is_bl()))
             .collect::<Result<Vec<_>, _>>()?
     };
 
