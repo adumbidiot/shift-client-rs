@@ -143,7 +143,7 @@ impl ShiftCode {
             None
         } else if is_bl {
             let captures = DATE_REGEX
-                .captures(dbg!(issue_date_str))
+                .captures(issue_date_str)
                 .ok_or(FromElementError::MissingIssueDate)?;
             let y = captures
                 .name("year_1")
