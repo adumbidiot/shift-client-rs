@@ -36,7 +36,7 @@ impl CodeRedemptionPage {
             .select(&check_redemption_status_url_selector)
             .next()
             .and_then(|element| element.value().attr("data-url"))
-            .map(|url| format!("https://shift.gearboxsoftware.com{}", url))
+            .map(|url| format!("https://shift.gearboxsoftware.com{url}"))
             .ok_or(FromHtmlError::MissingCheckRedemptionStatusUrl)?;
 
         Ok(Self {

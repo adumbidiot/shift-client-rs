@@ -60,7 +60,7 @@ impl AccountPage {
 }
 
 fn get_text_by_id<'a>(html: &'a Html, id: &str) -> Option<&'a str> {
-    let selector = Selector::parse(&format!("#{}", id)).ok()?;
+    let selector = Selector::parse(&format!("#{id}")).ok()?;
     let element = html.select(&selector).next()?;
     element.text().next()
 }

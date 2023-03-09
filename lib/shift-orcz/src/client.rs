@@ -102,7 +102,7 @@ fn extract_shift_codes(html: &Html, game: Game) -> Result<Vec<ShiftCode>, Extrac
 
                     let mut resolved_code = ret
                         .iter()
-                        .find(|el| el.issue_date == lookup_date)
+                        .find(|el| el.issue_date == Some(lookup_date))
                         .ok_or(ExtractShiftCodesError::Unknown)?
                         .get_code(code_index)
                         .ok_or(ExtractShiftCodesError::Unknown)?

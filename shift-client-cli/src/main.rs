@@ -11,8 +11,8 @@ use std::time::Duration;
 async fn manual_loop(client: &Client) {
     let rewards_page = match client.get_rewards_page().await {
         Ok(p) => p,
-        Err(e) => {
-            eprintln!("Failed to get rewards page, got error: {:#?}", e);
+        Err(error) => {
+            eprintln!("Failed to get rewards page, got error: {error:#?}");
             return;
         }
     };
@@ -26,8 +26,8 @@ async fn manual_loop(client: &Client) {
             break;
         }
 
-        if let Err(e) = redeem_code(client, &rewards_page, code.trim()).await {
-            eprintln!("{:?}", e);
+        if let Err(error) = redeem_code(client, &rewards_page, code.trim()).await {
+            eprintln!("{error:?}");
             eprintln!();
         }
     }
@@ -38,8 +38,8 @@ async fn auto_loop(client: &Client) {
 
     let rewards_page = match client.get_rewards_page().await {
         Ok(p) => p,
-        Err(e) => {
-            eprintln!("Failed to get rewards page, got error: {:#?}", e);
+        Err(error) => {
+            eprintln!("Failed to get rewards page, got error: {error:#?}");
             return;
         }
     };
@@ -55,12 +55,12 @@ async fn auto_loop(client: &Client) {
             "blps" => break Game::BorderlandsPreSequel,
             "bl3" => break Game::Borderlands3,
             data => {
-                eprintln!("'{}' is not a valid option", data);
+                eprintln!("\"{data}\" is not a valid option");
                 eprintln!();
             }
         }
     };
-    println!("Targeting game: {:?}", game);
+    println!("Targeting game: {game:?}");
 
     let codes = match orcz_client
         .get_shift_codes(game)
@@ -68,8 +68,8 @@ async fn auto_loop(client: &Client) {
         .context("Failed to get shift codes")
     {
         Ok(codes) => codes,
-        Err(e) => {
-            eprintln!("{:?}", e);
+        Err(error) => {
+            eprintln!("{error:?}");
             eprintln!();
             return;
         }
@@ -85,7 +85,13 @@ async fn auto_loop(client: &Client) {
         {
             println!("Code: {}", code.as_str());
             println!("Reward: {}", shift_code.rewards);
-            println!("Issue Date: {}", shift_code.issue_date);
+            println!(
+                "Issue Date: {}",
+                shift_code
+                    .issue_date
+                    .map(|date| format!("{date}"))
+                    .unwrap_or_else(|| "Unknown".into())
+            );
             println!("Source: {}", shift_code.source);
             println!();
 
@@ -95,8 +101,8 @@ async fn auto_loop(client: &Client) {
                     Ok(()) => {
                         break;
                     }
-                    Err(e) => {
-                        if let Some(ShiftError::Reqwest(e)) = e.downcast_ref::<ShiftError>() {
+                    Err(error) => {
+                        if let Some(ShiftError::Reqwest(e)) = error.downcast_ref::<ShiftError>() {
                             if let Some(StatusCode::TOO_MANY_REQUESTS) = e.status() {
                                 eprintln!("Encountered 429, backing off for 60 seconds...");
                                 tokio::time::sleep(Duration::from_secs(60)).await;
@@ -104,7 +110,7 @@ async fn auto_loop(client: &Client) {
                             }
                         }
 
-                        eprintln!("{:?}", e);
+                        eprintln!("{error:?}");
                         eprintln!();
 
                         break;
@@ -131,8 +137,8 @@ async fn redeem_code(
     for form in forms {
         match redeem_form(client, &form).await {
             Ok(()) => {}
-            Err(e) => {
-                eprintln!("{:?}", e);
+            Err(error) => {
+                eprintln!("{error:?}");
                 eprintln!();
             }
         }
@@ -147,9 +153,9 @@ async fn redeem_form(client: &Client, form: &RewardForm) -> anyhow::Result<()> {
 
     if let Some(redeem_response) = redeem_response {
         if let Some(text) = redeem_response.text {
-            println!("Response: {}", text);
+            println!("Response: {text}");
         } else {
-            eprintln!("Unknown Redeem Response: {:#?}", redeem_response);
+            eprintln!("Unknown Redeem Response: {redeem_response:#?}");
         }
     }
 
@@ -204,8 +210,8 @@ async fn login_client() -> Client {
 
                 break client;
             }
-            Err(e) => {
-                eprintln!("{:?}", e);
+            Err(error) => {
+                eprintln!("{error:?}");
                 eprintln!();
             }
         }
