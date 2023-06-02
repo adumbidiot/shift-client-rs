@@ -12,7 +12,7 @@ pub const XBOX_CODE_INDEX: usize = 2;
 static TD_SELECTOR: Lazy<Selector> =
     Lazy::new(|| Selector::parse("td").expect("invalid TD_SELECTOR"));
 static DATE_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2})(th|nd)? ?,? (?P<year_2>\d{4}))").unwrap()
+    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_1_1>\d{1,2}).(?P<day_1_1>\d{2}).(?P<year_1_1>\d{4}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2})(th|nd)? ?,? (?P<year_2>\d{4}))").unwrap()
 });
 
 /// Error that may occur while parsing a ShiftCode from an element
@@ -230,7 +230,7 @@ fn process_rewards_node(element: ElementRef) -> String {
 }
 
 fn parse_issue_date_str(issue_date_str: &str) -> Result<Option<time::Date>, FromElementError> {
-    if dbg!(issue_date_str) == "Unknown" {
+    if issue_date_str == "Unknown" {
         Ok(None)
     } else {
         let captures = DATE_REGEX
@@ -238,6 +238,7 @@ fn parse_issue_date_str(issue_date_str: &str) -> Result<Option<time::Date>, From
             .ok_or(FromElementError::MissingIssueDate)?;
         let y = captures
             .name("year_1")
+            .or_else(|| captures.name("year_1_1"))
             .or_else(|| captures.name("year_2"))
             .ok_or(FromElementError::IssueDateMissingYear)?
             .as_str()
@@ -245,6 +246,7 @@ fn parse_issue_date_str(issue_date_str: &str) -> Result<Option<time::Date>, From
             .map_err(FromElementError::IssueDateInvalidYear)?;
         let m = captures
             .name("month_1")
+            .or_else(|| captures.name("month_1_1"))
             .map(|month| {
                 let month = month
                     .as_str()
@@ -275,6 +277,7 @@ fn parse_issue_date_str(issue_date_str: &str) -> Result<Option<time::Date>, From
             .ok_or(FromElementError::IssueDateMissingMonth)??;
         let d = captures
             .name("day_1")
+            .or_else(|| captures.name("day_1_1"))
             .or_else(|| captures.name("day_2"))
             .ok_or(FromElementError::IssueDateMissingDay)?
             .as_str()
