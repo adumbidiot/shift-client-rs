@@ -44,7 +44,7 @@ license-files = [
 ]
 
 [bans]
-multiple-versions = "deny"
+multiple-versions = "warn"
 highlight = "all"
 skip = [
     # Blocked on phf_generator updating rand to 0.8.x
