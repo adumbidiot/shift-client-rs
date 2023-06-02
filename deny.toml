@@ -36,6 +36,13 @@ license-files = [
 ]
 
 [[licenses.clarify]]
+name = "rustls-webpki"
+expression = "ISC"
+license-files = [
+    { path = "LICENSE", hash = 0x001c7e6c },
+]
+
+[[licenses.clarify]]
 name = "encoding_rs"
 version = "*"
 expression = "(Apache-2.0 OR MIT) AND BSD-3-Clause"
@@ -64,9 +71,10 @@ skip = [
     # Blocked on cookie-store updating idna
     { name = "idna", version = "0.2.3" },
     
-    # Blocked on ecosystem updating to windows 0.45.0
-    { name = "windows-sys", version = "0.42.0" },
-    { name = "windows", version = "0.42.0" },
+    { name = "syn", version = "1.0.109" },
+    { name = "windows_x86_64_msvc", version = "0.42.2" },
+    { name = "windows-targets", version = "0.42.2" },
+    { name = "windows-sys", version = "0.45.0" },
 ]
 
 deny = [    
