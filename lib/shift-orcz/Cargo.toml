@@ -11,10 +11,10 @@ reqwest = { version = "0.11.18", default-features = false }
 scraper = { version = "0.16.0", default-features = false }
 thiserror = "1.0.40"
 time = { version = "0.3.22", features = [ "parsing", "macros" ] }
-tokio = { version = "1.28.2", features = [ "rt" ] }
+tokio = { version = "1.29.1", features = [ "rt" ] }
 
 [dev-dependencies]
-tokio = { version = "1.28.2", features = [ "macros" ] }
+tokio = { version = "1.29.1", features = [ "macros" ] }
 
 [features]
 default = ["reqwest/rustls-tls"]
