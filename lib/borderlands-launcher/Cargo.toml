@@ -14,7 +14,7 @@ bytes = { version = "1.4.0", default-features = false }
 futures-util = { version = "0.3.28", default-features = false }
 prost = "0.11.9"
 reqwest = { version = "0.11.18", features = [ "gzip", "deflate", "stream" ], default-features = false }
-thiserror = "1.0.40"
+thiserror = "1.0.43"
 tokio = { version = "1.28.2", default-features = false }
 tokio-util = { version = "0.7.8", features = [ "io" ], default-features = false }
 
