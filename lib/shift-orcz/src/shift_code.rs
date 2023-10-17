@@ -11,7 +11,7 @@ pub const XBOX_CODE_INDEX: usize = 2;
 
 static TD_SELECTOR: Lazy<Selector> = Lazy::new(|| Selector::parse("td").unwrap());
 static DATE_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{2}))|((?P<month_1_1>\d{1,2}).(?P<day_1_1>\d{2}).(?P<year_1_1>\d{4}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2})(th|nd)? ?,? (?P<year_2>\d{4}))").unwrap()
+    Regex::new(r"((?P<year_1>\d{4}).(?P<month_1>\d{2}).(?P<day_1>\d{1,2}))|((?P<month_1_1>\d{1,2}).(?P<day_1_1>\d{2}).(?P<year_1_1>\d{4}))|((?P<month_2>[[:alpha:]]*?) *(?P<day_2>\d{1,2})(th|nd)? ?,? (?P<year_2>\d{4}))").unwrap()
 });
 
 /// Error that may occur while parsing a ShiftCode from an element
