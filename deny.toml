@@ -60,6 +60,10 @@ skip = [
     
     { name = "syn", version = "1.0.109" },
     { name = "socket2", version = "0.4.9" },
+    { name = "bitflags", version = "1.3.2" },
+    { name = "phf", version = "0.10.1" },
+    { name = "phf_shared", version = "0.10.0" },
+    { name = "phf_generator", version = "0.10.0" },
 ]
 
 deny = [    
