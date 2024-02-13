@@ -11,10 +11,10 @@ impl Game {
     /// Get the orcz page url
     pub(crate) fn page_url(&self) -> &'static str {
         match self {
-            Self::Borderlands => "https://orcz.com/Borderlands:_Golden_Key",
-            Self::Borderlands2 => "https://orcz.com/borderlands_2:_Golden_Key",
-            Self::BorderlandsPreSequel => "https://orcz.com/Borderlands_Pre-Sequel:_Shift_Codes",
-            Self::Borderlands3 => "https://orcz.com/Borderlands_3:_Shift_Codes",
+            Self::Borderlands => "http://orcz.com/Borderlands:_Golden_Key",
+            Self::Borderlands2 => "http://orcz.com/borderlands_2:_Golden_Key",
+            Self::BorderlandsPreSequel => "http://orcz.com/Borderlands_Pre-Sequel:_Shift_Codes",
+            Self::Borderlands3 => "http://orcz.com/Borderlands_3:_Shift_Codes",
         }
     }
 
