@@ -10,7 +10,7 @@ regex = "1.10.3"
 reqwest = { version = "0.11.24", default-features = false }
 scraper = { version = "0.18.1", default-features = false }
 thiserror = "1.0.57"
-time = { version = "0.3.31", features = [ "parsing", "macros" ] }
+time = { version = "0.3.34", features = [ "parsing", "macros" ] }
 tokio = { version = "1.35.1", features = [ "rt" ] }
 
 [dev-dependencies]
