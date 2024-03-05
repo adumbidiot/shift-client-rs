@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["borderlands_launcher","shift_client","shift_orcz"];
