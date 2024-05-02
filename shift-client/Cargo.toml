@@ -10,7 +10,7 @@ reqwest = { version = "0.12.3", default-features = false, features = [ "cookies"
 scraper = { version = "0.19.0", default-features = false }
 serde = { version = "1.0.197", features = [ "derive" ] }
 serde_json = "1.0.115"
-thiserror = "1.0.58"
+thiserror = "1.0.59"
 tokio = { version = "1.37.0", features = [ "time" ] }
 
 [dev-dependencies]
