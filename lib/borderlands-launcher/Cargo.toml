@@ -20,7 +20,7 @@ tokio-util = { version = "0.7.10", features = [ "io" ], default-features = false
 
 # Optional
 anyhow = { version = "1.0.82", optional = true }
-prost-build = { version = "0.12.3", optional = true }
+prost-build = { version = "0.12.4", optional = true }
 
 [dev-dependencies]
 tokio = { version = "1.37.0", features = ["macros"] }
