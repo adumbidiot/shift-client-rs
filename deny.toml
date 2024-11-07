@@ -1,3 +1,4 @@
+[graph]
 targets = [
     { triple = "x86_64-unknown-linux-gnu" },
     { triple = "x86_64-unknown-linux-musl" },
@@ -6,19 +7,12 @@ targets = [
 ]
 
 [advisories]
-vulnerability = "deny"
-unmaintained = "deny"
-notice = "deny"
 ignore = []
 
 [licenses]
-unlicensed = "deny"
-copyleft = "deny"
-allow-osi-fsf-free = "neither"
 confidence-threshold = 0.93
-default = "deny"
 private = { ignore = true }
-allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause", "OpenSSL", "Unicode-DFS-2016" ]
+allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause", "OpenSSL", "Unicode-DFS-2016", "Unicode-3.0" ]
 exceptions = []
 
 [[licenses.clarify]]
@@ -55,13 +49,9 @@ multiple-versions = "warn"
 highlight = "all"
 skip = [    
     # Blocked on cookie-store updating idna
-    { name = "idna", version = "0.2.3" },
     { name = "idna", version = "0.3.0" },
+    { name = "idna", version = "0.5.0" },
     
-    { name = "syn", version = "1.0.109" },
-    { name = "socket2", version = "0.4.9" },
-    { name = "bitflags", version = "1.3.2" },
-    { name = "phf", version = "0.10.1" },
     { name = "phf_shared", version = "0.10.0" },
     { name = "phf_generator", version = "0.10.0" },
 ]
