@@ -5,16 +5,16 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-once_cell = "1.20.1"
-regex = "1.11.0"
-reqwest = { version = "0.12.8", default-features = false }
-scraper = { version = "0.20.0", default-features = false }
-thiserror = "1.0.64"
+once_cell = "1.20.2"
+regex = "1.11.1"
+reqwest = { version = "0.12.9", default-features = false }
+scraper = { version = "0.21.0", default-features = false }
+thiserror = "2.0.0"
 time = { version = "0.3.36", features = [ "parsing", "macros" ] }
-tokio = { version = "1.40.0", features = [ "rt" ] }
+tokio = { version = "1.41.1", features = [ "rt" ] }
 
 [dev-dependencies]
-tokio = { version = "1.40.0", features = [ "macros" ] }
+tokio = { version = "1.41.1", features = [ "macros" ] }
 
 [features]
 default = ["reqwest/rustls-tls"]
