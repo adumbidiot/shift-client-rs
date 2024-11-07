@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ShiftError"],"type":["InvalidAccountPage","InvalidCodeRedemptionPageError","InvalidHomePageError","RewardFormError","RewardsPageError","ShiftResult"]};
