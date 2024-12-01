@@ -9,12 +9,12 @@ name = "generate-protobuf-files"
 required-features = [ "generate-protobuf-files" ]
 
 [dependencies]
-async-compression = { version = "0.4.17", features = [ "tokio", "gzip" ], default-features = false }
-bytes = { version = "1.8.0", default-features = false }
+async-compression = { version = "0.4.18", features = [ "tokio", "gzip" ], default-features = false }
+bytes = { version = "1.9.0", default-features = false }
 futures-util = { version = "0.3.31", default-features = false }
 prost = "0.13.3"
 reqwest = { version = "0.12.9", features = [ "gzip", "deflate", "stream" ], default-features = false }
-thiserror = "2.0.0"
+thiserror = "2.0.3"
 tokio = { version = "1.41.1", default-features = false }
 tokio-util = { version = "0.7.12", features = [ "io" ], default-features = false }
 
