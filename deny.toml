@@ -12,7 +12,7 @@ ignore = []
 [licenses]
 confidence-threshold = 0.93
 private = { ignore = true }
-allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause", "OpenSSL", "Unicode-DFS-2016", "Unicode-3.0" ]
+allow = [ "Apache-2.0", "MIT", "Unlicense", "Zlib", "MPL-2.0", "ISC", "BSD-3-Clause", "OpenSSL", "Unicode-3.0" ]
 exceptions = []
 
 [[licenses.clarify]]
@@ -48,10 +48,6 @@ license-files = [
 multiple-versions = "warn"
 highlight = "all"
 skip = [    
-    # Blocked on cookie-store updating idna
-    { name = "idna", version = "0.3.0" },
-    { name = "idna", version = "0.5.0" },
-    
     { name = "phf_shared", version = "0.10.0" },
     { name = "phf_generator", version = "0.10.0" },
 ]
