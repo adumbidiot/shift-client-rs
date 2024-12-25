@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["input","input_yn"]};

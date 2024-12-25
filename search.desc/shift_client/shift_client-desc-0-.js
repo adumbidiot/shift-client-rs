@@ -1,0 +1,1 @@
+searchState.loadedDescShard("shift_client", 0, "Login the client\nRead a string from the console.\nRead a (Y/N) from the console.")
