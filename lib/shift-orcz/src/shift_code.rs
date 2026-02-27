@@ -193,14 +193,18 @@ impl ShiftCode {
             .next()
             .and_then(|el| el.text().next())
             .ok_or(FromElementError::MissingIssueDate)?
-            .trim()
-            .replace("??", "1"); // TODO: Consider making day optional
-        let issue_date = parse_issue_date_str(&issue_date_str).map_err(|error| {
-            FromElementError::InvalidIssueDate {
-                date: issue_date_str.into(),
-                error,
-            }
-        })?;
+            .trim();
+        // TODO: Consider making day optional
+        let issue_date = if issue_date_str == "??" {
+            None
+        } else {
+            parse_issue_date_str(&issue_date_str.replace("??", "1")).map_err(|error| {
+                FromElementError::InvalidIssueDate {
+                    date: issue_date_str.into(),
+                    error,
+                }
+            })?
+        };
 
         let _expiration = iter.next().ok_or(FromElementError::MissingExpiration)?;
 
@@ -250,7 +254,7 @@ fn process_rewards_node(element: ElementRef) -> String {
                 ret
             });
 
-    while ret.chars().next_back().map_or(false, |c| c.is_whitespace()) {
+    while ret.chars().next_back().is_some_and(|c| c.is_whitespace()) {
         ret.pop();
     }
 
