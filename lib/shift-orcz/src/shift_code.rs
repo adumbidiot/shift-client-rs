@@ -250,7 +250,7 @@ fn process_rewards_node(element: ElementRef) -> String {
                 ret
             });
 
-    while ret.chars().next_back().map_or(false, |c| c.is_whitespace()) {
+    while ret.chars().next_back().is_some_and(|c| c.is_whitespace()) {
         ret.pop();
     }
 

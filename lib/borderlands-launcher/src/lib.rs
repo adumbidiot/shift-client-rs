@@ -104,7 +104,7 @@ impl Client {
         let response = self.client.get(url).send().await?.error_for_status()?;
         let stream = response
             .bytes_stream()
-            .map_err(|error| std::io::Error::new(std::io::ErrorKind::Other, error));
+            .map_err(std::io::Error::other);
         let reader = StreamReader::new(stream);
         let mut decoder = GzipDecoder::new(reader);
 
