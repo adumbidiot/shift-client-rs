@@ -1,0 +1,1 @@
+rd_("Adborderlands_launcherlshift_clientjshift_orcz")

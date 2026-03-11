@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["PC_CODE_INDEX","PLAYSTATION_CODE_INDEX","XBOX_CODE_INDEX"],"enum":["FromElementError","InvalidIssueDateError"],"struct":["ShiftCode"]};
